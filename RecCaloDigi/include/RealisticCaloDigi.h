@@ -63,7 +63,7 @@ struct RealisticCaloDigi : k4FWCore::MultiTransformer<
     using integr_function = std::function<integr_res_opt(const edm4hep::SimCalorimeterHit&)>;
 
    float energyDigi(float energy, float event_correl_miscalib) const;
-   virtual integr_res_opt integrate(const edm4hep::SimCalorimeterHit& hit) const;
+   integr_res_opt integrate(const edm4hep::SimCalorimeterHit& hit) const;
    
    integr_res_opt standardIntegration(const edm4hep::SimCalorimeterHit& hit) const;
    integr_res_opt rocIntegration(const edm4hep::SimCalorimeterHit& hit) const;
