@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <cmath>
+#include <exception>
 
 using namespace std;
 
@@ -30,6 +31,16 @@ StatusCode RealisticCaloReco::initialize() {
   // the cellID encoding does not change during the job, so decode it once here
   m_bitFieldCoder =
       dd4hep::DDSegmentation::BitFieldCoder(m_geoSvc->constantAsString(m_encodingStringVariable.value()));
+
+  // both algorithms decode the layer number out of the cellID, so the encoding must provide it.
+  // Catching this here turns a per-event exception into a clear configuration error.
+  try {
+    m_bitFieldCoder.index("layer");
+  } catch (const std::exception&) {
+    error() << "The encoding string '" << m_encodingStringVariable.value() << "' ("
+            << m_bitFieldCoder.fieldDescription() << ") has no \"layer\" field" << endmsg;
+    return StatusCode::FAILURE;
+  }
 
   return StatusCode::SUCCESS;
 }
