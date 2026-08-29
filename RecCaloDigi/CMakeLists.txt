@@ -27,7 +27,6 @@ target_include_directories(RecCaloDigi PUBLIC
 # Concrete algorithm plugins — loaded at runtime by Gaudi
 gaudi_add_module(k4RecCaloDigiPlugins
   SOURCES
-    src/FilterDoubleLayerHits.cc
     src/RealisticCaloDigiScinPpd.cc
     src/RealisticCaloDigiSilicon.cc
     src/RealisticCaloRecoScinPpd.cc
