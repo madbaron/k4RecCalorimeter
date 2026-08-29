@@ -19,7 +19,8 @@
 #ifndef CalorimeterHitType_h
 #define CalorimeterHitType_h 1
 
-#include <iostream>
+#include <ostream>
+#include <string>
 
 /** Helper class for decoding/encoding lcio::CalorimeterHit types for the ILD
  *  detector. The encoding is: caloType + 10 * caloID + 1000 * layout + 10000 * layerNum <br>
@@ -79,13 +80,13 @@ public:
       : m_type(c * fCaloType + n * fCaloID + l * fLayout + lay * fLayer) {}
 
   /** calorimeter type: CHT::em , CHT::had, CHT::muon */
-  CaloType caloType() const { return (CaloType)(m_type % fCaloID); }
+  CaloType caloType() const { return static_cast<CaloType>(m_type % fCaloID); }
 
   /** calo ID - see enum CaloID for allowed values */
-  CaloID caloID() const { return (CaloID)((m_type % fLayout) / fCaloID); }
+  CaloID caloID() const { return static_cast<CaloID>((m_type % fLayout) / fCaloID); }
 
   /** calo layout - see enum layout for allowed values */
-  Layout layout() const { return (Layout)((m_type % fLayer) / fLayout); }
+  Layout layout() const { return static_cast<Layout>((m_type % fLayer) / fLayout); }
 
   /** calo layer of hit  */
   unsigned layer() const { return unsigned(m_type) / fLayer; }
@@ -106,20 +107,20 @@ protected:
   int m_type;
 
   static const int fCaloType = 1;
-  static const int fCaloID   = 10;
-  static const int fLayout   = 1000;
-  static const int fLayer    = 10000;
+  static const int fCaloID = 10;
+  static const int fLayout = 1000;
+  static const int fLayer = 10000;
 };
 
 /** detailed string for calo type */
 std::ostream& operator<<(std::ostream& os, const CHT& cht);
 
-/** Return Layout based on the collection name, e.g. if name contains tolower("endcap") CHT::endcap is returned. In case no known layout
-    is found, CHT::any is returned.*/
+/** Return Layout based on the collection name, e.g. if name contains tolower("endcap") CHT::endcap is returned. In case
+   no known layout is found, CHT::any is returned.*/
 CHT::Layout layoutFromString(const std::string& name);
 
-/** Return caloID based on the collection name, e.g. if name contains tolower("HCal") CHT::hcal is returned. In case no known type
-    is found, CHT::unknown is returned.*/
+/** Return caloID based on the collection name, e.g. if name contains tolower("HCal") CHT::hcal is returned. In case no
+   known type is found, CHT::unknown is returned.*/
 CHT::CaloID caloIDFromString(const std::string& name);
 
 /** Return caloType from string, e.g. if name contains tolower("Had") CHT::had is returned. In case no known type
