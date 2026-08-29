@@ -146,12 +146,6 @@ std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkColl
 
 //------------------------------------------------------------------------------
 
-StatusCode RealisticCaloDigi::finalize(){
-  return StatusCode::SUCCESS;
-}
-
-//------------------------------------------------------------------------------
-
 RealisticCaloDigi::integr_res_opt RealisticCaloDigi::integrate(const edm4hep::SimCalorimeterHit& hit) const {
   return m_integr_function(hit);
 }

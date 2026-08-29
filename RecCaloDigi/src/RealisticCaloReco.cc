@@ -85,6 +85,3 @@ float RealisticCaloReco::getLayerCalib( int ilayer ) const{
   return calib_coeff;
 }
 
-
-StatusCode RealisticCaloReco::finalize(){ return StatusCode::SUCCESS; }
-

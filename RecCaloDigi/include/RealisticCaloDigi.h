@@ -47,11 +47,6 @@ struct RealisticCaloDigi : k4FWCore::MultiTransformer<
                edm4hep::CaloHitSimCaloHitLinkCollection> operator()(
               const edm4hep::SimCalorimeterHitCollection& inputSim,
               const edm4hep::EventHeaderCollection& headers) const; 
-  
-    /** Called after data processing for clean up.
-     */
-    StatusCode finalize();
-
 
   protected:
   

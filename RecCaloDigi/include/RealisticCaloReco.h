@@ -42,12 +42,6 @@ struct RealisticCaloReco : k4FWCore::MultiTransformer<std::tuple<
     std::tuple<edm4hep::CalorimeterHitCollection, 
                edm4hep::CaloHitSimCaloHitLinkCollection> operator()(
               const edm4hep::CaloHitSimCaloHitLinkCollection& inputLinks) const; 
-  
-    /** Called after data processing for clean up.
-     */
-    StatusCode finalize();
-
-
 
  protected:
 
