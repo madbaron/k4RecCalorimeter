@@ -52,7 +52,7 @@ struct RealisticCaloReco : k4FWCore::MultiTransformer<std::tuple<
  protected:
 
   float getLayerCalib( int ilayer ) const;
-  virtual float reconstructEnergy(const edm4hep::CalorimeterHit* hit, int layer) const = 0;  // to be overloaded, technology-specific
+  virtual float reconstructEnergy(const edm4hep::CalorimeterHit& hit, int layer) const = 0; // to be overloaded, technology-specific
 
   // parameters
   // Grouping of calo layers

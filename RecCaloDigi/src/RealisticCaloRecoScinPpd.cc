@@ -6,9 +6,9 @@ DECLARE_COMPONENT(RealisticCaloRecoScinPpd)
 
 RealisticCaloRecoScinPpd::RealisticCaloRecoScinPpd(const std::string& name, ISvcLocator* svcLoc) : RealisticCaloReco(name, svcLoc) {}
 
-float RealisticCaloRecoScinPpd::reconstructEnergy(const edm4hep::CalorimeterHit* hit, int layer) const{
+float RealisticCaloRecoScinPpd::reconstructEnergy(const edm4hep::CalorimeterHit& hit, int layer) const{
   // here the input energy should be in NPE
-  float energy = hit->getEnergy();
+  float energy = hit.getEnergy();
 
   // first de-saturate PPD response
   // this is the fraction of SiPM pixels fired above which a linear continuation of the saturation-reconstruction function is used. 

@@ -60,14 +60,14 @@ struct RealisticCaloDigi : k4FWCore::MultiTransformer<
     // integration result types
     using integr_res = std::pair<float,float>;
     using integr_res_opt = std::optional<integr_res>;
-    using integr_function = std::function<integr_res_opt(const edm4hep::SimCalorimeterHit*)>;
+    using integr_function = std::function<integr_res_opt(const edm4hep::SimCalorimeterHit&)>;
 
-   virtual float EnergyDigi(float energy, float event_correl_miscalib) const;
-   virtual integr_res_opt Integrate( const edm4hep::SimCalorimeterHit * hit ) const;
+   float energyDigi(float energy, float event_correl_miscalib) const;
+   virtual integr_res_opt integrate(const edm4hep::SimCalorimeterHit& hit) const;
    
-   integr_res_opt StandardIntegration( const edm4hep::SimCalorimeterHit * hit ) const ;
-   integr_res_opt ROCIntegration( const edm4hep::SimCalorimeterHit * hit ) const ;
-   float SmearTime(float time) const;
+   integr_res_opt standardIntegration(const edm4hep::SimCalorimeterHit& hit) const;
+   integr_res_opt rocIntegration(const edm4hep::SimCalorimeterHit& hit) const;
+   float smearTime(float time) const;
 
    // virtual methods to be be overloaded in tech-specific derived classes
    virtual int    getMyUnit() const = 0 ;

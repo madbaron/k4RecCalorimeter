@@ -46,20 +46,18 @@ std::tuple<edm4hep::CalorimeterHitCollection,
   edm4hep::CaloHitSimCaloHitLinkCollection relcol;
   debug()  << " number of elements = " << inputLinks.size() << endmsg;
 
-  for (int j(0); j < inputLinks.size(); ++j) {
-      edm4hep::CaloHitSimCaloHitLink link = inputLinks.at( j ) ;
-      edm4hep::CalorimeterHit hit0 = link.getFrom();
-      edm4hep::CalorimeterHit *hit = &hit0;
+  for (const auto& link : inputLinks) {
+      const edm4hep::CalorimeterHit hit = link.getFrom();
       edm4hep::MutableCalorimeterHit calhit = newcol.create(); // make new hit
-      
-      int cellid = hit->getCellID();
-      float energy = reconstructEnergy( hit, bitFieldCoder.get(cellid, "layer") ); // overloaded method, technology dependent
 
-      calhit.setCellID(cellid);
+      const auto cellID = hit.getCellID();
+      float energy = reconstructEnergy( hit, bitFieldCoder.get(cellID, "layer") ); // overloaded method, technology dependent
+
+      calhit.setCellID(cellID);
       calhit.setEnergy(energy);
-      calhit.setTime( hit->getTime() );
-      calhit.setPosition( hit->getPosition() );
-      calhit.setType( hit->getType() );
+      calhit.setTime( hit.getTime() );
+      calhit.setPosition( hit.getPosition() );
+      calhit.setType( hit.getType() );
 
       edm4hep::MutableCaloHitSimCaloHitLink newLink = relcol.create();
       newLink.setFrom(calhit);

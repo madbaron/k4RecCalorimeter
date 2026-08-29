@@ -62,8 +62,8 @@ StatusCode RealisticCaloDigi::initialize() {
 
   // deal with timing calculations  
   std::map<std::string, integr_function> integrations = {
-    {"Standard", std::bind(&RealisticCaloDigi::StandardIntegration, this, _1)},
-    {"ROC", std::bind(&RealisticCaloDigi::ROCIntegration, this, _1)}
+    {"Standard", std::bind(&RealisticCaloDigi::standardIntegration, this, _1)},
+    {"ROC", std::bind(&RealisticCaloDigi::rocIntegration, this, _1)}
   };  
   auto findIter = integrations.find( m_integration_method ) ;
   if(integrations.end() == findIter) {
@@ -110,34 +110,31 @@ std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkColl
 
   debug() << "Number of elements = " << inputSim.size() << endmsg;
   // loop over input hits
-  for (int j=0; j < inputSim.size(); ++j) {
-    edm4hep::SimCalorimeterHit simhit0 = inputSim.at( j );
-    edm4hep::SimCalorimeterHit *simhit = &simhit0;
-
+  for (const auto& simhit : inputSim) {
     // deal with energy integration and timing aspects
-    auto integrationResult = Integrate(simhit);
+    const auto integrationResult = integrate(simhit);
     if( ! integrationResult.has_value() ) {
       continue;
     }
     float time      = integrationResult.value().first;
     float energyDep = integrationResult.value().second;
     // apply extra energy digitisation onto the energy
-    float energyDig = EnergyDigi(energyDep, event_correl_miscalib);
+    float energyDig = energyDigi(energyDep, event_correl_miscalib);
 
     if (energyDig > m_threshold_value) { // write out this hit
       edm4hep::MutableCalorimeterHit newhit = newcol.create();
-      newhit.setCellID( simhit->getCellID() );
+      newhit.setCellID( simhit.getCellID() );
       newhit.setTime( time );
-      newhit.setPosition( simhit->getPosition() );
-	    newhit.setEnergy( energyDig );
-      
-	    int layer = bitFieldCoder.get(simhit->getCellID(), "layer");
-	    newhit.setType( CHT( cht_type, cht_id, cht_lay, layer ) );
+      newhit.setPosition( simhit.getPosition() );
+      newhit.setEnergy( energyDig );
 
-      debug() << "orig/new hit energy: " << simhit->getEnergy() << " " << newhit.getEnergy() << endmsg;
+      int layer = bitFieldCoder.get(simhit.getCellID(), "layer");
+      newhit.setType( CHT( cht_type, cht_id, cht_lay, layer ) );
+
+      debug() << "orig/new hit energy: " << simhit.getEnergy() << " " << newhit.getEnergy() << endmsg;
 
       edm4hep::MutableCaloHitSimCaloHitLink rel = relcol.create();
-      rel.setTo(simhit0);
+      rel.setTo(simhit);
       rel.setFrom(newhit);
       rel.setWeight(1.0);
 
@@ -155,13 +152,13 @@ StatusCode RealisticCaloDigi::finalize(){
 
 //------------------------------------------------------------------------------
 
-RealisticCaloDigi::integr_res_opt RealisticCaloDigi::Integrate( const edm4hep::SimCalorimeterHit * hit ) const {
+RealisticCaloDigi::integr_res_opt RealisticCaloDigi::integrate(const edm4hep::SimCalorimeterHit& hit) const {
   return m_integr_function(hit);
 }
 
 //------------------------------------------------------------------------------
 
-float RealisticCaloDigi::EnergyDigi(float energy, float event_correl_miscalib) const{
+float RealisticCaloDigi::energyDigi(float energy, float event_correl_miscalib) const{
   // some extra digi effects
   // controlled by _applyDigi = 0 (none), 1 (apply)
   // input parameters: hit energy ( in any unit: effects are all relative )
@@ -199,12 +196,12 @@ float RealisticCaloDigi::EnergyDigi(float energy, float event_correl_miscalib) c
 
 //------------------------------------------------------------------------------
 
-RealisticCaloDigi::integr_res_opt RealisticCaloDigi::StandardIntegration( const edm4hep::SimCalorimeterHit * hit ) const {
+RealisticCaloDigi::integr_res_opt RealisticCaloDigi::standardIntegration(const edm4hep::SimCalorimeterHit& hit) const {
   // apply timing cuts on simhit contributions
   // outputs a (time,energy) pair
   float timeCorrection(0);
   if ( m_time_correctForPropagation ) { // time of flight from IP to this point
-    float r = pow(hit->getPosition().x,2) + pow(hit->getPosition().y,2) + pow(hit->getPosition().z,2); 
+    float r = pow(hit.getPosition().x,2) + pow(hit.getPosition().y,2) + pow(hit.getPosition().z,2);
     timeCorrection = sqrt(r)/CLHEP::c_light; // [speed of light in mm/ns]
   }
   // this is Oskar's simple (and probably the most correct) method for treatment of timing
@@ -212,7 +209,7 @@ RealisticCaloDigi::integr_res_opt RealisticCaloDigi::StandardIntegration( const 
   //  - assign time of earliest contribution to hit
   float energySum = 0;
   float earliestTime=std::numeric_limits<float>::max();
-  for(edm4hep::CaloHitContribution contribution : hit->getContributions()){ // loop over all contributions
+  for (const edm4hep::CaloHitContribution& contribution : hit.getContributions()) { // loop over all contributions
     float timei   = contribution.getTime(); //absolute hit timing of current subhit
     float energyi = contribution.getEnergy(); //energy of current subhit
     float relativetime = timei - timeCorrection; // wrt time of flight
@@ -224,20 +221,22 @@ RealisticCaloDigi::integr_res_opt RealisticCaloDigi::StandardIntegration( const 
     }
   }
   if(earliestTime > m_time_windowMin && earliestTime < m_time_windowMax){ //accept this hit
-    return integr_res{SmearTime(earliestTime), energySum};
+    return integr_res{smearTime(earliestTime), energySum};
   }
   return std::nullopt;
 }
 
 //------------------------------------------------------------------------------
 
-RealisticCaloDigi::integr_res_opt RealisticCaloDigi::ROCIntegration( const edm4hep::SimCalorimeterHit * hit ) const {
-  const unsigned int ncontrib = hit->contributions_size() ;
+RealisticCaloDigi::integr_res_opt RealisticCaloDigi::rocIntegration(const edm4hep::SimCalorimeterHit& hit) const {
+  const unsigned int ncontrib = hit.contributions_size();
   // Sort MC contribution by time
-  std::vector<MCC> mcconts{ncontrib};
-  for(int i=0; i<hit->getContributions().size();i++){
-    mcconts[i].energy = hit->getContributions(i).getEnergy();
-    mcconts[i].time = hit->getContributions(i).getTime();
+  std::vector<MCC> mcconts(ncontrib);
+  std::size_t icontrib = 0;
+  for (const auto& contribution : hit.getContributions()) {
+    mcconts[icontrib].energy = contribution.getEnergy();
+    mcconts[icontrib].time = contribution.getTime();
+    ++icontrib;
   }
   std::sort(mcconts.begin(), mcconts.end(), [](auto lhs, auto rhs){
     return (lhs.time < rhs.time);
@@ -285,7 +284,7 @@ RealisticCaloDigi::integr_res_opt RealisticCaloDigi::ROCIntegration( const edm4h
         energySum += mcconts[i].energy;
       }
     }
-    hitTime = SmearTime(hitTime);
+    hitTime = smearTime(hitTime);
     return integr_res{hitTime, energySum};
   }
   // else no hit dude !
@@ -296,7 +295,7 @@ RealisticCaloDigi::integr_res_opt RealisticCaloDigi::ROCIntegration( const edm4h
 
 //------------------------------------------------------------------------------
 
-float RealisticCaloDigi::SmearTime(float time) const{
+float RealisticCaloDigi::smearTime(float time) const{
   return m_time_resol>0.f ? time + m_engine.Gaus(0, m_time_resol) : time;
 }
 

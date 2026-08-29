@@ -17,7 +17,7 @@ struct RealisticCaloRecoSilicon final : RealisticCaloReco {
   RealisticCaloRecoSilicon(const std::string& name, ISvcLocator* svcLoc);
 
  protected:
-  float reconstructEnergy(const edm4hep::CalorimeterHit* hit, int layer) const override;
+  float reconstructEnergy(const edm4hep::CalorimeterHit& hit, int layer) const override;
 } ;
 
 #endif 
