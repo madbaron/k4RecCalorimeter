@@ -229,30 +229,31 @@ RealisticCaloDigi::integr_res_opt RealisticCaloDigi::standardIntegration(const e
 //------------------------------------------------------------------------------
 
 RealisticCaloDigi::integr_res_opt RealisticCaloDigi::rocIntegration(const edm4hep::SimCalorimeterHit& hit) const {
-  const unsigned int ncontrib = hit.contributions_size();
-  // Sort MC contribution by time
-  std::vector<MCC> mcconts(ncontrib);
-  std::size_t icontrib = 0;
+  // Collect the MC contributions, then sort them by time
+  std::vector<MCC> mcconts;
+  mcconts.reserve(hit.contributions_size());
   for (const auto& contribution : hit.getContributions()) {
-    mcconts[icontrib].energy = contribution.getEnergy();
-    mcconts[icontrib].time = contribution.getTime();
-    ++icontrib;
+    mcconts.push_back({contribution.getEnergy(), contribution.getTime()});
   }
-  std::sort(mcconts.begin(), mcconts.end(), [](auto lhs, auto rhs){
+  if (mcconts.empty()) {
+    return std::nullopt;
+  }
+  const std::size_t ncontrib = mcconts.size();
+  std::sort(mcconts.begin(), mcconts.end(), [](const MCC& lhs, const MCC& rhs){
     return (lhs.time < rhs.time);
   });
   // Accumulate energy until threshold is reached.
   // The first MC contriubtion after the threshold has been reached sets the hit time 
   bool passThreshold = false;
   float epar=0.f, hitTime=0.f;
-  unsigned int thresholdIndex=0;
+  std::size_t thresholdIndex=0;
   // First determine the hit time (hitTime) and the initial hit index 
   // at which we need to start the integration (thresholdIndex)
-  for(unsigned int i=0; i<ncontrib ; ++i) {
+  for(std::size_t i=0; i<ncontrib ; ++i) {
     const auto timei = mcconts[i].time;
     thresholdIndex = i ;
     epar = 0.f;
-    for(unsigned int j=i; j<ncontrib ; ++j) {
+    for(std::size_t j=i; j<ncontrib ; ++j) {
       const auto timej = mcconts[j].time;
       if( (timej-timei) < m_fast_shaper) {
         epar += mcconts[j].energy;
@@ -279,7 +280,7 @@ RealisticCaloDigi::integr_res_opt RealisticCaloDigi::rocIntegration(const edm4he
   // until the maximum time given by the slow shaper
   if(passThreshold) {
     float energySum = 0.f ; 
-    for(unsigned int i=thresholdIndex ; i<ncontrib ; ++i) {
+    for(std::size_t i=thresholdIndex ; i<ncontrib ; ++i) {
       if( mcconts[i].time < thresholdTime + m_slow_shaper) {
         energySum += mcconts[i].energy;
       }
