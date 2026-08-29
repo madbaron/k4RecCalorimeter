@@ -1,7 +1,5 @@
 #include "RealisticCaloReco.h"
 
-#include <DDSegmentation/BitFieldCoder.h>
-
 #include <edm4hep/SimCalorimeterHit.h>
 #include <edm4hep/MutableCalorimeterHit.h>
 #include <edm4hep/CaloHitSimCaloHitLinkCollection.h>
@@ -29,6 +27,10 @@ StatusCode RealisticCaloReco::initialize() {
   assert ( m_calibrCoeff.size()>0 );
   assert ( m_calibrCoeff.size() == m_calLayers.size() );
 
+  // the cellID encoding does not change during the job, so decode it once here
+  m_bitFieldCoder =
+      dd4hep::DDSegmentation::BitFieldCoder(m_geoSvc->constantAsString(m_encodingStringVariable.value()));
+
   return StatusCode::SUCCESS;
 }
 
@@ -38,10 +40,6 @@ std::tuple<edm4hep::CalorimeterHitCollection,
            edm4hep::CaloHitSimCaloHitLinkCollection> RealisticCaloReco::operator()(
            const edm4hep::CaloHitSimCaloHitLinkCollection& inputLinks) const {
   // * Reading Collections of digitised calorimeter Hits *
-  std::string initString;
-  initString = m_geoSvc->constantAsString(m_encodingStringVariable.value());
-  dd4hep::DDSegmentation::BitFieldCoder bitFieldCoder(initString);  // check!
-  
   edm4hep::CalorimeterHitCollection newcol;
   edm4hep::CaloHitSimCaloHitLinkCollection relcol;
   debug()  << " number of elements = " << inputLinks.size() << endmsg;
@@ -51,7 +49,7 @@ std::tuple<edm4hep::CalorimeterHitCollection,
       edm4hep::MutableCalorimeterHit calhit = newcol.create(); // make new hit
 
       const auto cellID = hit.getCellID();
-      float energy = reconstructEnergy( hit, bitFieldCoder.get(cellID, "layer") ); // overloaded method, technology dependent
+      float energy = reconstructEnergy( hit, m_bitFieldCoder.get(cellID, "layer") ); // overloaded method, technology dependent
 
       calhit.setCellID(cellID);
       calhit.setEnergy(energy);

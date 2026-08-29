@@ -11,6 +11,8 @@
 #include "k4Interface/IGeoSvc.h"
 #include "k4Interface/IUniqueIDGenSvc.h"
 
+#include <DDSegmentation/BitFieldCoder.h>
+
 #include "TRandom2.h"
 
 #include <string>
@@ -101,6 +103,8 @@ struct RealisticCaloDigi : k4FWCore::MultiTransformer<
    inline static thread_local TRandom2 m_engine;
    SmartIF<IGeoSvc>                    m_geoSvc;
    SmartIF<IUniqueIDGenSvc>            m_uidSvc;
+   // built once in initialize() from the geometry encoding string
+   dd4hep::DDSegmentation::BitFieldCoder m_bitFieldCoder{};
  
 
    integr_function m_integr_function{};

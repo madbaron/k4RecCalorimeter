@@ -6,8 +6,6 @@
 #include <edm4hep/CaloHitContribution.h>
 #include <CalorimeterHitType.h>
 
-#include <DDSegmentation/BitFieldCoder.h>
-
 #include <k4Interface/IUniqueIDGenSvc.h>
 
 #include <algorithm>
@@ -45,6 +43,10 @@ StatusCode RealisticCaloDigi::initialize() {
     error() << "Unable to get UniqueIDGenSvc" << endmsg;
     return StatusCode::FAILURE;
   }
+
+  // the cellID encoding does not change during the job, so decode it once here
+  m_bitFieldCoder =
+      dd4hep::DDSegmentation::BitFieldCoder(m_geoSvc->constantAsString(m_encodingStringVariable.value()));
 
 
   // unit in which threshold is specified
@@ -108,10 +110,6 @@ std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkColl
   CHT::CaloID   cht_id   = caloIDFromString(m_calo_id);
   CHT::Layout   cht_lay  = layoutFromString(m_calo_layout);
 
-  std::string initString;
-  initString = m_geoSvc->constantAsString(m_encodingStringVariable.value());
-  dd4hep::DDSegmentation::BitFieldCoder bitFieldCoder(initString);  // check!
-
   debug() << "Number of elements = " << inputSim.size() << endmsg;
   // loop over input hits
   for (const auto& simhit : inputSim) {
@@ -132,7 +130,7 @@ std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkColl
       newhit.setPosition( simhit.getPosition() );
       newhit.setEnergy( energyDig );
 
-      int layer = bitFieldCoder.get(simhit.getCellID(), "layer");
+      int layer = m_bitFieldCoder.get(simhit.getCellID(), "layer");
       newhit.setType( CHT( cht_type, cht_id, cht_lay, layer ) );
 
       debug() << "orig/new hit energy: " << simhit.getEnergy() << " " << newhit.getEnergy() << endmsg;

@@ -10,6 +10,8 @@
 #include "CalorimeterHitType.h"
 #include "k4Interface/IGeoSvc.h"
 
+#include <DDSegmentation/BitFieldCoder.h>
+
 #include <string>
 #include <vector>
 
@@ -57,6 +59,8 @@ struct RealisticCaloReco : k4FWCore::MultiTransformer<std::tuple<
   Gaudi::Property<std::string> m_encodingStringVariable{this, "EncodingStringParameterName", "GlobalTrackerReadoutID", "The name of the DD4hep constant that contains the Encoding string for tracking detectors"};
 
   SmartIF<IGeoSvc> m_geoSvc;
+  // built once in initialize() from the geometry encoding string
+  dd4hep::DDSegmentation::BitFieldCoder m_bitFieldCoder{};
 
 } ;
 
