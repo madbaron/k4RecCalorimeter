@@ -15,12 +15,12 @@ implementations inheriting from them.
 
 | Algorithm | Purpose |
 |---|---|
-| `RealisticCaloDigi` | Base digitiser: timing cuts and charge integration, miscalibration, dead cells, electronics noise and dynamic range. `SimCalorimeterHit` → `CalorimeterHit`. |
-| `RealisticCaloDigiSilicon` | Silicon-specific digitisation; output on the MIP scale. |
-| `RealisticCaloDigiScinPpd` | Scintillator + PPD digitisation including SiPM saturation and pixel statistics; output in photo-electrons. |
-| `RealisticCaloReco` | Base calibration: applies layer-group calibration constants to go from the digitised scale to shower GeV. |
-| `RealisticCaloRecoSilicon` | MIP → GeV calibration. |
-| `RealisticCaloRecoScinPpd` | PPD de-saturation, NPE → MIP → GeV calibration. |
+| `BaseDigitiser` | Base digitiser: timing cuts and charge integration, miscalibration, dead cells, electronics noise and dynamic range. `SimCalorimeterHit` → `CalorimeterHit`. |
+| `BaseDigitiserSilicon` | Silicon-specific digitisation; output on the MIP scale. |
+| `BaseDigitiserScinPpd` | Scintillator + PPD digitisation including SiPM saturation and pixel statistics; output in photo-electrons. |
+| `BaseCellEnergyCalibrator` | Base calibration: applies layer-group calibration constants to go from the digitised scale to shower GeV. |
+| `BaseCellEnergyCalibratorSilicon` | MIP → GeV calibration. |
+| `BaseCellEnergyCalibratorScinPpd` | PPD de-saturation, NPE → MIP → GeV calibration. |
 
 Both stages emit a `CaloHitSimCaloHitLink` collection relating their output hits back to the
 originating simulated hits.

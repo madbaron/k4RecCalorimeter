@@ -1,16 +1,16 @@
-#ifndef REALISTICCALORECOSCINPPD_H
-#define REALISTICCALORECOSCINPPD_H 1
+#ifndef BASECELLENERGYCALIBRATORSCINPPD_H
+#define BASECELLENERGYCALIBRATORSCINPPD_H 1
 
-#include "RealisticCaloReco.h"
+#include "BaseCellEnergyCalibrator.h"
 
-/** === RealisticCaloRecoSilicon Processor === <br>
-    realistic reconstruction of scint+PPD calorimeter hits
+/** === BaseCellEnergyCalibratorScinPpd algorithm === <br>
+    calibration of digitised scint+PPD calorimeter hits
     D.Jeans 02/2016.
 */
 
-struct RealisticCaloRecoScinPpd final : RealisticCaloReco {
+struct BaseCellEnergyCalibratorScinPpd final : BaseCellEnergyCalibrator {
  public:
-  RealisticCaloRecoScinPpd(const std::string& name, ISvcLocator* svcLoc);
+  BaseCellEnergyCalibratorScinPpd(const std::string& name, ISvcLocator* svcLoc);
 
  protected:
   float reconstructEnergy(const edm4hep::CalorimeterHit& hit, int layer) const override;

@@ -1,5 +1,5 @@
 // Calorimeter digitiser
-#include "RealisticCaloDigi.h"
+#include "BaseDigitiser.h"
 
 #include <edm4hep/MutableCalorimeterHit.h>
 #include <edm4hep/CaloHitSimCaloHitLinkCollection.h>
@@ -27,13 +27,13 @@ struct MCC {
   float time {0.f};
 };
 
-RealisticCaloDigi::RealisticCaloDigi(const std::string& name, ISvcLocator* svcLoc) : MultiTransformer(name, svcLoc,
+BaseDigitiser::BaseDigitiser(const std::string& name, ISvcLocator* svcLoc) : MultiTransformer(name, svcLoc,
     { KeyValue("inputHitCollection", "SimCalorimeterHits"),
       KeyValue("inputHeaderCollection", "EventHeader") },
     { KeyValue("outputHitCollection", "CalorimeterHits"),
       KeyValue("outputRelationCollection", "CaloHitLinks") }) {}
 
-StatusCode RealisticCaloDigi::initialize() {
+StatusCode BaseDigitiser::initialize() {
   m_geoSvc = serviceLocator()->service("GeoSvc");
   if (!m_geoSvc) {
     error() << "Unable to retrieve the GeoSvc" << endmsg;
@@ -77,8 +77,8 @@ StatusCode RealisticCaloDigi::initialize() {
 
   // deal with timing calculations  
   std::map<std::string, integr_function> integrations = {
-    {"Standard", std::bind(&RealisticCaloDigi::standardIntegration, this, _1)},
-    {"ROC", std::bind(&RealisticCaloDigi::rocIntegration, this, _1)}
+    {"Standard", std::bind(&BaseDigitiser::standardIntegration, this, _1)},
+    {"ROC", std::bind(&BaseDigitiser::rocIntegration, this, _1)}
   };  
   auto findIter = integrations.find( m_integration_method ) ;
   if(integrations.end() == findIter) {
@@ -103,7 +103,7 @@ StatusCode RealisticCaloDigi::initialize() {
 
 
 
-std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkCollection> RealisticCaloDigi::operator()(
+std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkCollection> BaseDigitiser::operator()(
       const edm4hep::SimCalorimeterHitCollection& inputSim,
       const edm4hep::EventHeaderCollection& headers) const {
   auto seed = m_uidSvc->getUniqueID(headers[0].getEventNumber(), headers[0].getRunNumber(), this->name());
@@ -159,13 +159,13 @@ std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkColl
 
 //------------------------------------------------------------------------------
 
-RealisticCaloDigi::integr_res_opt RealisticCaloDigi::integrate(const edm4hep::SimCalorimeterHit& hit) const {
+BaseDigitiser::integr_res_opt BaseDigitiser::integrate(const edm4hep::SimCalorimeterHit& hit) const {
   return m_integr_function(hit);
 }
 
 //------------------------------------------------------------------------------
 
-float RealisticCaloDigi::energyDigi(float energy, float event_correl_miscalib) const{
+float BaseDigitiser::energyDigi(float energy, float event_correl_miscalib) const{
   // some extra digi effects
   // controlled by _applyDigi = 0 (none), 1 (apply)
   // input parameters: hit energy ( in any unit: effects are all relative )
@@ -203,7 +203,7 @@ float RealisticCaloDigi::energyDigi(float energy, float event_correl_miscalib) c
 
 //------------------------------------------------------------------------------
 
-RealisticCaloDigi::integr_res_opt RealisticCaloDigi::standardIntegration(const edm4hep::SimCalorimeterHit& hit) const {
+BaseDigitiser::integr_res_opt BaseDigitiser::standardIntegration(const edm4hep::SimCalorimeterHit& hit) const {
   // apply timing cuts on simhit contributions
   // outputs a (time,energy) pair
   float timeCorrection(0);
@@ -235,7 +235,7 @@ RealisticCaloDigi::integr_res_opt RealisticCaloDigi::standardIntegration(const e
 
 //------------------------------------------------------------------------------
 
-RealisticCaloDigi::integr_res_opt RealisticCaloDigi::rocIntegration(const edm4hep::SimCalorimeterHit& hit) const {
+BaseDigitiser::integr_res_opt BaseDigitiser::rocIntegration(const edm4hep::SimCalorimeterHit& hit) const {
   // Collect the MC contributions, then sort them by time
   std::vector<MCC> mcconts;
   mcconts.reserve(hit.contributions_size());
@@ -303,7 +303,7 @@ RealisticCaloDigi::integr_res_opt RealisticCaloDigi::rocIntegration(const edm4he
 
 //------------------------------------------------------------------------------
 
-float RealisticCaloDigi::smearTime(float time) const{
+float BaseDigitiser::smearTime(float time) const{
   return m_time_resol>0.f ? time + m_engine.Gaus(0, m_time_resol) : time;
 }
 

@@ -1,5 +1,5 @@
-#ifndef DIGITIZER_REALISTICCALORECO_H
-#define DIGITIZER_REALISTICCALORECO_H 1
+#ifndef BASECELLENERGYCALIBRATOR_H
+#define BASECELLENERGYCALIBRATOR_H 1
 
 #include <k4FWCore/Transformer.h>
 
@@ -16,10 +16,10 @@
 #include <vector>
 
 
-/** === RealisticCaloReco Processor === <br>
-    realistic reconstruction of calorimeter hits
+/** === BaseCellEnergyCalibrator algorithm === <br>
+    calibration of digitised calorimeter hits
     e.g. apply sampling fraction correction
-    virtual class, technology indenpendent
+    abstract base class, technology independent
     D.Jeans 02/2016.
 
     24 March 2016: removed gap corrections - to be put into separate processor
@@ -27,19 +27,19 @@
 */
 
 
-struct RealisticCaloReco : k4FWCore::MultiTransformer<std::tuple<
+struct BaseCellEnergyCalibrator : k4FWCore::MultiTransformer<std::tuple<
     edm4hep::CalorimeterHitCollection, 
     edm4hep::CaloHitSimCaloHitLinkCollection>(
       const edm4hep::CaloHitSimCaloHitLinkCollection&)> {
   
  public:
-    RealisticCaloReco(const std::string& name, ISvcLocator* svcLoc);
+    BaseCellEnergyCalibrator(const std::string& name, ISvcLocator* svcLoc);
     /** Called at the begin of the job before anything is read.
     * Use to initialize the processor, e.g. book histograms.
     */
     StatusCode initialize();
   
-    /** Called for every run.
+    /** Called for every event.
      */
     std::tuple<edm4hep::CalorimeterHitCollection, 
                edm4hep::CaloHitSimCaloHitLinkCollection> operator()(

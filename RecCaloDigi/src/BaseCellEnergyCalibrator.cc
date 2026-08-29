@@ -1,4 +1,4 @@
-#include "RealisticCaloReco.h"
+#include "BaseCellEnergyCalibrator.h"
 
 #include <edm4hep/SimCalorimeterHit.h>
 #include <edm4hep/MutableCalorimeterHit.h>
@@ -13,12 +13,12 @@
 
 using namespace std;
 
-RealisticCaloReco::RealisticCaloReco(const std::string& name, ISvcLocator* svcLoc) : MultiTransformer(name, svcLoc,
+BaseCellEnergyCalibrator::BaseCellEnergyCalibrator(const std::string& name, ISvcLocator* svcLoc) : MultiTransformer(name, svcLoc,
   { KeyValue("inputLinkCollection", "CaloHitLinks") },
   { KeyValue("outputHitCollection", "CalorimeterHitsRec"),
     KeyValue("outputRelationCollection", "CaloHitLinksRec") }) {}
 
-StatusCode RealisticCaloReco::initialize() {
+StatusCode BaseCellEnergyCalibrator::initialize() {
   m_geoSvc = serviceLocator()->service("GeoSvc");
   if (!m_geoSvc) {
     error() << "Unable to retrieve the GeoSvc" << endmsg;
@@ -48,7 +48,7 @@ StatusCode RealisticCaloReco::initialize() {
 //-----------------------------------------------------------------------------------------------
 
 std::tuple<edm4hep::CalorimeterHitCollection, 
-           edm4hep::CaloHitSimCaloHitLinkCollection> RealisticCaloReco::operator()(
+           edm4hep::CaloHitSimCaloHitLinkCollection> BaseCellEnergyCalibrator::operator()(
            const edm4hep::CaloHitSimCaloHitLinkCollection& inputLinks) const {
   // * Reading Collections of digitised calorimeter Hits *
   edm4hep::CalorimeterHitCollection newcol;
@@ -77,7 +77,7 @@ std::tuple<edm4hep::CalorimeterHitCollection,
   return std::make_tuple(std::move(newcol), std::move(relcol));
 }
 
-float RealisticCaloReco::getLayerCalib( int ilayer ) const{
+float BaseCellEnergyCalibrator::getLayerCalib( int ilayer ) const{
   float calib_coeff = 0;
   // retrieve calibration constants
   // Fixed the following logic (DJeans, June 2016)

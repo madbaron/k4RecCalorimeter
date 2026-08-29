@@ -1,18 +1,18 @@
-#ifndef DIGITIZER_DDCCALODIGISCINT_H
-#define DIGITIZER_DDCCALODIGISCINT_H 1
+#ifndef BASEDIGITISERSCINPPD_H
+#define BASEDIGITISERSCINPPD_H 1
 
-#include "RealisticCaloDigi.h"
+#include "BaseDigitiser.h"
 
 
-/** === RealisticCaloDigiScinPpd Processor === <br>
-    realistic digitisation of scint+PPD (SiPM, MPPC) calorimeter hits
+/** === BaseDigitiserScinPpd algorithm === <br>
+    digitisation of scint+PPD (SiPM, MPPC) calorimeter hits
     D.Jeans 02/2016.
 */
 
-struct RealisticCaloDigiScinPpd : public RealisticCaloDigi {
+struct BaseDigitiserScinPpd : public BaseDigitiser {
   
  public:
-  RealisticCaloDigiScinPpd(const std::string& name, ISvcLocator* svcLoc);
+  BaseDigitiserScinPpd(const std::string& name, ISvcLocator* svcLoc);
 
  protected:
   int getMyUnit() const {return NPE;}

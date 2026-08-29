@@ -1,5 +1,5 @@
-#ifndef REALISTICCALODIGI_H
-#define REALISTICCALODIGI_H 1
+#ifndef BASEDIGITISER_H
+#define BASEDIGITISER_H 1
 
 #include <k4FWCore/Transformer.h>
 #include <edm4hep/SimCalorimeterHit.h>
@@ -22,28 +22,28 @@
 #include <optional>
 
 
-/** === RealisticCaloDigi Processor === <br>
+/** === BaseDigitiser algorithm === <br>
     Digitisation of calorimeter hits
     e.g. timing, dead cells, miscalibrations
-    this is virtual class, technology-blind
-    technology-specific classes can inherit from this one
+    this is an abstract base class, technology-blind
+    technology-specific classes inherit from this one
     D. Jeans 02/2016, rewrite of parts of ILDCaloDigi, DDCaloDigi
     R. Ete 11/2020, rewrite of charge integration and extension of timing treatment
  */
 
-struct RealisticCaloDigi : k4FWCore::MultiTransformer<
+struct BaseDigitiser : k4FWCore::MultiTransformer<
     std::tuple<edm4hep::CalorimeterHitCollection, 
     edm4hep::CaloHitSimCaloHitLinkCollection>(
       const edm4hep::SimCalorimeterHitCollection&,
       const edm4hep::EventHeaderCollection&)> {
   public:
-    RealisticCaloDigi(const std::string& name, ISvcLocator* svcLoc);
+    BaseDigitiser(const std::string& name, ISvcLocator* svcLoc);
     /** Called at the begin of the job before anything is read.
     * Use to initialize the processor, e.g. book histograms.
     */
     StatusCode initialize();
   
-    /** Called for every run.
+    /** Called for every event.
      */
     std::tuple<edm4hep::CalorimeterHitCollection, 
                edm4hep::CaloHitSimCaloHitLinkCollection> operator()(

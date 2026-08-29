@@ -1,7 +1,7 @@
 // Calorimeter digitiser for the IDC ECAL and HCAL
 // For other detectors/models SimpleCaloDigi should be used
 
-#include "RealisticCaloDigiScinPpd.h"
+#include "BaseDigitiserScinPpd.h"
 
 #include <iostream>
 #include <string>
@@ -13,20 +13,20 @@
 
 using namespace std;
 
-DECLARE_COMPONENT(RealisticCaloDigiScinPpd)
+DECLARE_COMPONENT(BaseDigitiserScinPpd)
 
-RealisticCaloDigiScinPpd::RealisticCaloDigiScinPpd(const std::string& name, ISvcLocator* svcLoc)
- : RealisticCaloDigi(name, svcLoc) {}
+BaseDigitiserScinPpd::BaseDigitiserScinPpd(const std::string& name, ISvcLocator* svcLoc)
+ : BaseDigitiser(name, svcLoc) {}
 
-float RealisticCaloDigiScinPpd::convertEnergy( float energy, int inUnit ) const { // convert energy from input to output scale (NPE)
+float BaseDigitiserScinPpd::convertEnergy( float energy, int inUnit ) const { // convert energy from input to output scale (NPE)
   if      ( inUnit==NPE ) return energy;
   else if ( inUnit==MIP ) return m_PPD_pe_per_mip*energy;
   else if ( inUnit==GEVDEP ) return m_PPD_pe_per_mip*energy/m_calib_mip;
 
-  throw std::runtime_error("RealisticCaloDigiScinPpd::convertEnergy - unknown unit " + std::to_string(inUnit));
+  throw std::runtime_error("BaseDigitiserScinPpd::convertEnergy - unknown unit " + std::to_string(inUnit));
 }
 
-float RealisticCaloDigiScinPpd::digitiseDetectorEnergy(float energy) const {
+float BaseDigitiserScinPpd::digitiseDetectorEnergy(float energy) const {
   // input energy in deposited GeV
   // output in npe
   float npe = energy*m_PPD_pe_per_mip/m_calib_mip; // convert to pe scale

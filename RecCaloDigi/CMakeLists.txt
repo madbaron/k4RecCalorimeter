@@ -5,8 +5,8 @@
 gaudi_add_library(RecCaloDigi
   SOURCES
     src/CalorimeterHitType.cc
-    src/RealisticCaloDigi.cc
-    src/RealisticCaloReco.cc
+    src/BaseDigitiser.cc
+    src/BaseCellEnergyCalibrator.cc
   LINK
     Gaudi::GaudiKernel
     EDM4HEP::edm4hep
@@ -27,10 +27,10 @@ target_include_directories(RecCaloDigi PUBLIC
 # Concrete algorithm plugins — loaded at runtime by Gaudi
 gaudi_add_module(k4RecCaloDigiPlugins
   SOURCES
-    src/RealisticCaloDigiScinPpd.cc
-    src/RealisticCaloDigiSilicon.cc
-    src/RealisticCaloRecoScinPpd.cc
-    src/RealisticCaloRecoSilicon.cc
+    src/BaseDigitiserScinPpd.cc
+    src/BaseDigitiserSilicon.cc
+    src/BaseCellEnergyCalibratorScinPpd.cc
+    src/BaseCellEnergyCalibratorSilicon.cc
   LINK
     RecCaloDigi
     Gaudi::GaudiKernel
