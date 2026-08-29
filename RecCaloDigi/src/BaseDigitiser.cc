@@ -122,11 +122,20 @@ std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkColl
   CHT::Layout   cht_lay  = layoutFromString(m_calo_layout);
 
   debug() << "Number of elements = " << inputSim.size() << endmsg;
+
+  std::size_t nOutsideWindow = 0;
+  std::size_t nBelowThreshold = 0;
+
   // loop over input hits
   for (const auto& simhit : inputSim) {
     // deal with energy integration and timing aspects
     const auto integrationResult = integrate(simhit);
     if( ! integrationResult.has_value() ) {
+      // No contribution fell inside the integration window. This is expected for
+      // out-of-time hits, so it is not worth more than a debug message.
+      ++nOutsideWindow;
+      debug() << "Dropping hit with cellID " << simhit.getCellID()
+              << ": no contribution inside the integration window" << endmsg;
       continue;
     }
     float time      = integrationResult.value().first;
@@ -151,8 +160,16 @@ std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkColl
       rel.setFrom(newhit);
       rel.setWeight(1.0);
 
-    } // theshold
-  } // input hits 
+    } // threshold
+    else {
+      ++nBelowThreshold;
+      debug() << "Dropping hit with cellID " << simhit.getCellID() << ": digitised energy " << energyDig
+              << " below threshold " << m_threshold_value.value() << endmsg;
+    }
+  } // input hits
+
+  debug() << "Digitised " << newcol.size() << " of " << inputSim.size() << " hits (" << nOutsideWindow
+          << " outside the integration window, " << nBelowThreshold << " below threshold)" << endmsg;
 
   return std::make_tuple(std::move(newcol), std::move(relcol));
 }
