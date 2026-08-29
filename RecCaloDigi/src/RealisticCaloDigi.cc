@@ -43,6 +43,7 @@ StatusCode RealisticCaloDigi::initialize() {
   m_uidSvc = service<IUniqueIDGenSvc>("UniqueIDGenSvc", true);
   if (!m_uidSvc) {
     error() << "Unable to get UniqueIDGenSvc" << endmsg;
+    return StatusCode::FAILURE;
   }
 
 
@@ -55,6 +56,7 @@ StatusCode RealisticCaloDigi::initialize() {
     m_threshold_iunit=NPE;
   } else {
     error() << "could not identify threshold unit. Please use \"GeV\", \"MIP\" or \"px\"! Aborting." << endmsg;
+    return StatusCode::FAILURE;
   }
   
   // convert the threshold to the approriate units (i.e. MIP for silicon, NPE for scint)
@@ -70,6 +72,7 @@ StatusCode RealisticCaloDigi::initialize() {
     error() << "Could not guess timing calculation method!" << endmsg;
     error() << "Available are: Standard, ROC. Provided: " << m_integration_method << endmsg;
     error() << "Aborting..." << endmsg;
+    return StatusCode::FAILURE;
   }
   m_integr_function = findIter->second;
   
@@ -78,6 +81,7 @@ StatusCode RealisticCaloDigi::initialize() {
     if(m_fast_shaper == 0.0f || m_slow_shaper == 0.0f) {
       error() << "Fast/slow shaper parameter(s) not set. Required for ROC integration!" << endmsg;
       error() << "Aborting..." << endmsg;
+      return StatusCode::FAILURE;
     }
   }
 
