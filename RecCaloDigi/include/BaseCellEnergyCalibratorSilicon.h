@@ -13,11 +13,11 @@
 
 struct BaseCellEnergyCalibratorSilicon final : BaseCellEnergyCalibrator {
 
- public:
+public:
   BaseCellEnergyCalibratorSilicon(const std::string& name, ISvcLocator* svcLoc);
 
- protected:
+protected:
   float reconstructEnergy(const edm4hep::CalorimeterHit& hit, int layer) const override;
-} ;
+};
 
-#endif 
+#endif
