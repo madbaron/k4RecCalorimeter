@@ -68,7 +68,7 @@ std::tuple<edm4hep::CalorimeterHitCollection,
       calhit.setPosition( hit.getPosition() );
       calhit.setType( hit.getType() );
 
-      edm4hep::MutableCaloHitSimCaloHitLink newLink = relcol.create();
+      auto newLink = relcol.create();
       newLink.setFrom(calhit);
       newLink.setTo(link.getTo());
       newLink.setWeight(1.0);

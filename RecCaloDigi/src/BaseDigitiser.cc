@@ -146,7 +146,7 @@ std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkColl
 
       debug() << "orig/new hit energy: " << simhit.getEnergy() << " " << newhit.getEnergy() << endmsg;
 
-      edm4hep::MutableCaloHitSimCaloHitLink rel = relcol.create();
+      auto rel = relcol.create();
       rel.setTo(simhit);
       rel.setFrom(newhit);
       rel.setWeight(1.0);
