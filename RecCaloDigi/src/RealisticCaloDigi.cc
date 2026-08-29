@@ -27,11 +27,11 @@ struct MCC {
   float time {0.f};
 };
 
-RealisticCaloDigi::RealisticCaloDigi(const std::string& name, ISvcLocator* svcLoc) : MultiTransformer(name, svcLoc, 
-    { KeyValues("inputHitCollections", {"SimCalorimeterHits"}),
-      KeyValues("inputHeaderCollections", {"EventHeader"}) },
-    { KeyValues("outputHitCollections", {"CalorimeterHits"}),
-     KeyValues("outputRelationCollections", {"CaloHitLinks"}) }) {}
+RealisticCaloDigi::RealisticCaloDigi(const std::string& name, ISvcLocator* svcLoc) : MultiTransformer(name, svcLoc,
+    { KeyValue("inputHitCollection", "SimCalorimeterHits"),
+      KeyValue("inputHeaderCollection", "EventHeader") },
+    { KeyValue("outputHitCollection", "CalorimeterHits"),
+      KeyValue("outputRelationCollection", "CaloHitLinks") }) {}
 
 StatusCode RealisticCaloDigi::initialize() {
   m_geoSvc = serviceLocator()->service("GeoSvc");

@@ -13,10 +13,10 @@
 
 using namespace std;
 
-RealisticCaloReco::RealisticCaloReco(const std::string& name, ISvcLocator* svcLoc) : MultiTransformer(name, svcLoc, 
-  { KeyValues("inputLinkCollections", {"CaloHitLinks"}) },
-  { KeyValues("outputHitCollections", {"CalorimeterHitsRec"}),
-   KeyValues("outputRelationCollections", {"CaloHitLinksRec"}) }) {}
+RealisticCaloReco::RealisticCaloReco(const std::string& name, ISvcLocator* svcLoc) : MultiTransformer(name, svcLoc,
+  { KeyValue("inputLinkCollection", "CaloHitLinks") },
+  { KeyValue("outputHitCollection", "CalorimeterHitsRec"),
+    KeyValue("outputRelationCollection", "CaloHitLinksRec") }) {}
 
 StatusCode RealisticCaloReco::initialize() {
   m_geoSvc = serviceLocator()->service("GeoSvc");
