@@ -59,11 +59,11 @@ StatusCode BaseDigitiser::initialize() {
 
   // unit in which threshold is specified
   if (m_threshold_unit.value().compare("MIP") == 0) {
-    m_threshold_iunit = MIP;
+    m_threshold_iunit = EnergyScale::MIP;
   } else if (m_threshold_unit.value().compare("GeV") == 0) {
-    m_threshold_iunit = GEVDEP;
+    m_threshold_iunit = EnergyScale::GEVDEP;
   } else if (m_threshold_unit.value().compare("px") == 0) {
-    m_threshold_iunit = NPE;
+    m_threshold_iunit = EnergyScale::NPE;
   } else {
     error() << "could not identify threshold unit. Please use \"GeV\", \"MIP\" or \"px\"! Aborting." << endmsg;
     return StatusCode::FAILURE;
@@ -73,7 +73,7 @@ StatusCode BaseDigitiser::initialize() {
   m_threshold_value = convertEnergy(m_threshold_value, m_threshold_iunit);
 
   // deal with timing calculations
-  std::map<std::string, integr_function> integrations = {
+  std::map<std::string, IntegrationFunction> integrations = {
       {"Standard", std::bind(&BaseDigitiser::standardIntegration, this, _1)},
       {"ROC", std::bind(&BaseDigitiser::rocIntegration, this, _1)}};
   auto findIter = integrations.find(m_integration_method);
@@ -132,8 +132,8 @@ BaseDigitiser::operator()(const edm4hep::SimCalorimeterHitCollection& inputSim,
               << endmsg;
       continue;
     }
-    float time = integrationResult.value().first;
-    float energyDep = integrationResult.value().second;
+    float time = integrationResult->time;
+    float energyDep = integrationResult->energy;
     // apply extra energy digitisation onto the energy
     float energyDig = energyDigi(energyDep, event_correl_miscalib);
 
@@ -170,7 +170,7 @@ BaseDigitiser::operator()(const edm4hep::SimCalorimeterHitCollection& inputSim,
 
 //------------------------------------------------------------------------------
 
-BaseDigitiser::integr_res_opt BaseDigitiser::integrate(const edm4hep::SimCalorimeterHit& hit) const {
+BaseDigitiser::IntegrationResult BaseDigitiser::integrate(const edm4hep::SimCalorimeterHit& hit) const {
   return m_integr_function(hit);
 }
 
@@ -198,7 +198,7 @@ float BaseDigitiser::energyDigi(float energy, float event_correl_miscalib) const
   if (m_misCalib_correl > 0)
     e_out *= event_correl_miscalib;
 
-  float oneMipInMyUnits = convertEnergy(1.0, MIP);
+  float oneMipInMyUnits = convertEnergy(1.0, EnergyScale::MIP);
   // limited electronics dynamic range
   if (m_elec_rangeMip > 0)
     e_out = std::min(e_out, m_elec_rangeMip * oneMipInMyUnits);
@@ -217,9 +217,9 @@ float BaseDigitiser::energyDigi(float energy, float event_correl_miscalib) const
 
 //------------------------------------------------------------------------------
 
-BaseDigitiser::integr_res_opt BaseDigitiser::standardIntegration(const edm4hep::SimCalorimeterHit& hit) const {
+BaseDigitiser::IntegrationResult BaseDigitiser::standardIntegration(const edm4hep::SimCalorimeterHit& hit) const {
   // apply timing cuts on simhit contributions
-  // outputs a (time,energy) pair
+  // outputs the accepted time and integrated energy
   float timeCorrection(0);
   if (m_time_correctForPropagation) { // time of flight from IP to this point
     float r = pow(hit.getPosition().x, 2) + pow(hit.getPosition().y, 2) + pow(hit.getPosition().z, 2);
@@ -242,14 +242,14 @@ BaseDigitiser::integr_res_opt BaseDigitiser::standardIntegration(const edm4hep::
     }
   }
   if (earliestTime > m_time_windowMin && earliestTime < m_time_windowMax) { // accept this hit
-    return integr_res{smearTime(earliestTime), energySum};
+    return TimeEnergy{smearTime(earliestTime), energySum};
   }
   return std::nullopt;
 }
 
 //------------------------------------------------------------------------------
 
-BaseDigitiser::integr_res_opt BaseDigitiser::rocIntegration(const edm4hep::SimCalorimeterHit& hit) const {
+BaseDigitiser::IntegrationResult BaseDigitiser::rocIntegration(const edm4hep::SimCalorimeterHit& hit) const {
   // Collect the MC contributions, then sort them by time
   std::vector<MCC> mcconts;
   mcconts.reserve(hit.contributions_size());
@@ -279,7 +279,7 @@ BaseDigitiser::integr_res_opt BaseDigitiser::rocIntegration(const edm4hep::SimCa
       } else {
         break;
       }
-      if (convertEnergy(epar, GEVDEP) > m_threshold_value) {
+      if (convertEnergy(epar, EnergyScale::GEVDEP) > m_threshold_value) {
         hitTime = timej;
         passThreshold = true;
         break;
@@ -304,7 +304,7 @@ BaseDigitiser::integr_res_opt BaseDigitiser::rocIntegration(const edm4hep::SimCa
       }
     }
     hitTime = smearTime(hitTime);
-    return integr_res{hitTime, energySum};
+    return TimeEnergy{hitTime, energySum};
   }
   // else no hit dude !
   else {

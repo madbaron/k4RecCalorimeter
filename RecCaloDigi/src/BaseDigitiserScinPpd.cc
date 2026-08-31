@@ -18,16 +18,17 @@ DECLARE_COMPONENT(BaseDigitiserScinPpd)
 BaseDigitiserScinPpd::BaseDigitiserScinPpd(const std::string& name, ISvcLocator* svcLoc)
     : BaseDigitiser(name, svcLoc) {}
 
-float BaseDigitiserScinPpd::convertEnergy(float energy,
-                                          int inUnit) const { // convert energy from input to output scale (NPE)
-  if (inUnit == NPE)
+// convert energy from input to output scale (NPE)
+float BaseDigitiserScinPpd::convertEnergy(float energy, EnergyScale inUnit) const {
+  if (inUnit == EnergyScale::NPE)
     return energy;
-  else if (inUnit == MIP)
+  else if (inUnit == EnergyScale::MIP)
     return m_PPD_pe_per_mip * energy;
-  else if (inUnit == GEVDEP)
+  else if (inUnit == EnergyScale::GEVDEP)
     return m_PPD_pe_per_mip * energy / m_calib_mip;
 
-  throw std::runtime_error("BaseDigitiserScinPpd::convertEnergy - unknown unit " + std::to_string(inUnit));
+  throw std::runtime_error("BaseDigitiserScinPpd::convertEnergy - unknown unit " +
+                           std::to_string(static_cast<int>(inUnit)));
 }
 
 float BaseDigitiserScinPpd::digitiseDetectorEnergy(float energy) const {

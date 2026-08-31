@@ -17,15 +17,16 @@ DECLARE_COMPONENT(BaseDigitiserSilicon)
 BaseDigitiserSilicon::BaseDigitiserSilicon(const std::string& name, ISvcLocator* svcLoc)
     : BaseDigitiser(name, svcLoc) {}
 
-float BaseDigitiserSilicon::convertEnergy(float energy,
-                                          int inUnit) const { // convert energy from input to output scale (MIP)
+// convert energy from input to output scale (MIP)
+float BaseDigitiserSilicon::convertEnergy(float energy, EnergyScale inUnit) const {
   // converts input energy to MIP scale
-  if (inUnit == MIP)
+  if (inUnit == EnergyScale::MIP)
     return energy;
-  else if (inUnit == GEVDEP)
+  else if (inUnit == EnergyScale::GEVDEP)
     return energy / m_calib_mip;
 
-  throw std::runtime_error("BaseDigitiserSilicon::convertEnergy - unknown unit " + std::to_string(inUnit));
+  throw std::runtime_error("BaseDigitiserSilicon::convertEnergy - unknown unit " +
+                           std::to_string(static_cast<int>(inUnit)));
 }
 
 float BaseDigitiserSilicon::digitiseDetectorEnergy(float energy) const {

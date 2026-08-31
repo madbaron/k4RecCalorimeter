@@ -47,23 +47,26 @@ public:
 
 protected:
   // energy scales we know about
-  enum { MIP, GEVDEP, NPE };
-  // integration result types
-  using integr_res = std::pair<float, float>;
-  using integr_res_opt = std::optional<integr_res>;
-  using integr_function = std::function<integr_res_opt(const edm4hep::SimCalorimeterHit&)>;
+  enum class EnergyScale { MIP, GEVDEP, NPE };
+  // result of integrating the contributions of one simulated hit
+  struct TimeEnergy {
+    float time{0.f};
+    float energy{0.f};
+  };
+  using IntegrationResult = std::optional<TimeEnergy>;
+  using IntegrationFunction = std::function<IntegrationResult(const edm4hep::SimCalorimeterHit&)>;
 
   float energyDigi(float energy, float event_correl_miscalib) const;
-  integr_res_opt integrate(const edm4hep::SimCalorimeterHit& hit) const;
+  IntegrationResult integrate(const edm4hep::SimCalorimeterHit& hit) const;
 
-  integr_res_opt standardIntegration(const edm4hep::SimCalorimeterHit& hit) const;
-  integr_res_opt rocIntegration(const edm4hep::SimCalorimeterHit& hit) const;
+  IntegrationResult standardIntegration(const edm4hep::SimCalorimeterHit& hit) const;
+  IntegrationResult rocIntegration(const edm4hep::SimCalorimeterHit& hit) const;
   float smearTime(float time) const;
 
   // virtual methods to be be overloaded in tech-specific derived classes
-  virtual int getMyUnit() const = 0;
   virtual float digitiseDetectorEnergy(float energy) const = 0;
-  virtual float convertEnergy(float energy, int inScale) const = 0; // convert energy from input to output scale
+  // convert energy from the input scale to the scale of the derived class
+  virtual float convertEnergy(float energy, EnergyScale inScale) const = 0;
 
   // timing
   Gaudi::Property<int> m_time_apply{this, "timingCut", 0, "Use hit times"};
@@ -105,14 +108,14 @@ protected:
   Gaudi::Property<std::string> m_calo_layout{this, "CaloLayout", "barrel",
                                              "Calorimeter Layout: barrel, endcap, ring, plug"};
 
-  int m_threshold_iunit{};
+  EnergyScale m_threshold_iunit{EnergyScale::MIP};
   inline static thread_local TRandom2 m_engine;
   SmartIF<IGeoSvc> m_geoSvc;
   SmartIF<IUniqueIDGenSvc> m_uidSvc;
   // built once in initialize() from the geometry encoding string
   dd4hep::DDSegmentation::BitFieldCoder m_bitFieldCoder{};
 
-  integr_function m_integr_function{};
+  IntegrationFunction m_integr_function{};
 };
 
 #endif
