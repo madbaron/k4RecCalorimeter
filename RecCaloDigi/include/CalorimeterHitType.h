@@ -19,6 +19,22 @@
 #ifndef CalorimeterHitType_h
 #define CalorimeterHitType_h 1
 
+/* NOTE ON DUPLICATION
+ *
+ * This file (and its .cc) originate in MarlinUtil and are also carried, in near-identical
+ * form, by k4GaudiPandora. That package compiles them privately into its Gaudi plugin module
+ * rather than exposing an installed target, so there is nothing for this package to link
+ * against and the sources are duplicated here instead.
+ *
+ * This copy has since been made a little safer to use: the three enums are scoped
+ * (enum class), and CaloType gained the "unknown" fallback that CaloID and Layout already
+ * had, so a calorimeter type that matches nothing is no longer silently reported as
+ * electromagnetic. The encoded integer is unchanged for all pre-existing values.
+ *
+ * The duplication should be resolved by promoting these to a single shared, installed
+ * location that both packages depend on.
+ */
+
 #include <ostream>
 #include <string>
 
