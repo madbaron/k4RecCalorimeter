@@ -14,7 +14,7 @@
 
 #include <DDSegmentation/BitFieldCoder.h>
 
-#include "TRandom2.h"
+#include "TRandom3.h"
 
 #include <functional>
 #include <optional>
@@ -115,7 +115,9 @@ protected:
   CHT::CaloType m_chtType{CHT::CaloType::unknown};
   CHT::CaloID m_chtId{CHT::CaloID::unknown};
   CHT::Layout m_chtLayout{CHT::Layout::any};
-  inline static thread_local TRandom2 m_engine;
+  // Re-seeded from the UniqueIDGenSvc at the start of every event, so results depend only on
+  // (run, event, algorithm name) and not on how events are distributed over threads.
+  inline static thread_local TRandom3 m_engine;
   SmartIF<IGeoSvc> m_geoSvc;
   SmartIF<IUniqueIDGenSvc> m_uidSvc;
   // built once in initialize() from the geometry encoding string
