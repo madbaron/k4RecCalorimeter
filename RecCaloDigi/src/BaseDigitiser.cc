@@ -118,10 +118,7 @@ StatusCode BaseDigitiser::initialize() {
 std::tuple<edm4hep::CalorimeterHitCollection, edm4hep::CaloHitSimCaloHitLinkCollection>
 BaseDigitiser::operator()(const edm4hep::SimCalorimeterHitCollection& inputSim,
                           const edm4hep::EventHeaderCollection& headers) const {
-  auto seed = m_uidSvc->getUniqueID(headers[0].getEventNumber(), headers[0].getRunNumber(), this->name());
-  debug() << "Using seed " << seed << " for event " << headers[0].getEventNumber() << " and run "
-          << headers[0].getRunNumber() << endmsg;
-  m_engine.SetSeed(seed);
+  m_engine.SetSeed(m_uidSvc->getUniqueID(headers, this->name()));
 
   // decide on this event's correlated miscalibration
   float event_correl_miscalib = (m_misCalib_correl > 0) ? m_engine.Gaus(1.0, m_misCalib_correl) : 0;
