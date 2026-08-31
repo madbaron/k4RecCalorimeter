@@ -5,7 +5,6 @@
 #include <edm4hep/SimCalorimeterHit.h>
 
 #include <algorithm>
-#include <assert.h>
 #include <cmath>
 #include <exception>
 #include <iostream>
@@ -25,8 +24,37 @@ StatusCode BaseCellEnergyCalibrator::initialize() {
     return StatusCode::FAILURE;
   }
 
-  assert(m_calibrCoeff.size() > 0);
-  assert(m_calibrCoeff.size() == m_calLayers.size());
+  // Validate the calibration configuration. These were asserts, which compile away in the
+  // release builds this package actually ships in; as initialize() checks they also get to
+  // tell the user what is wrong.
+  if (m_calibrCoeff.empty()) {
+    error() << "No calibration coefficients given: calibration_factorsMipGev is empty" << endmsg;
+    return StatusCode::FAILURE;
+  }
+  if (m_calibrCoeff.size() != m_calLayers.size()) {
+    error() << "calibration_factorsMipGev has " << m_calibrCoeff.size() << " entries but calibration_layergroups has "
+            << m_calLayers.size() << ": they must describe the same groups" << endmsg;
+    return StatusCode::FAILURE;
+  }
+  for (std::size_t k = 0; k < m_calibrCoeff.size(); ++k) {
+    if (m_calibrCoeff[k] <= 0.f) {
+      error() << "calibration_factorsMipGev[" << k << "] is " << m_calibrCoeff[k] << ", must be > 0" << endmsg;
+      return StatusCode::FAILURE;
+    }
+    if (m_calLayers[k] <= 0) {
+      error() << "calibration_layergroups[" << k << "] is " << m_calLayers[k]
+              << ", must be > 0: a group spanning no layers has an unusable calibration constant" << endmsg;
+      return StatusCode::FAILURE;
+    }
+  }
+
+  // Expand the layer groups into one coefficient per layer. m_calLayers holds group sizes, so
+  // group k covers the next m_calLayers[k] layers after the groups before it.
+  m_layerCalib.clear();
+  for (std::size_t k = 0; k < m_calLayers.size(); ++k) {
+    m_layerCalib.insert(m_layerCalib.end(), static_cast<std::size_t>(m_calLayers[k]), m_calibrCoeff[k]);
+  }
+  debug() << "Calibration covers " << m_layerCalib.size() << " layers in " << m_calLayers.size() << " groups" << endmsg;
 
   // the cellID encoding does not change during the job, so decode it once here
   m_bitFieldCoder = dd4hep::DDSegmentation::BitFieldCoder(m_geoSvc->constantAsString(m_encodingStringVariable.value()));
@@ -77,19 +105,11 @@ BaseCellEnergyCalibrator::operator()(const edm4hep::CaloHitSimCaloHitLinkCollect
 }
 
 float BaseCellEnergyCalibrator::getLayerCalib(int ilayer) const {
-  float calib_coeff = 0;
   // retrieve calibration constants
-  // Fixed the following logic (DJeans, June 2016)
-  int min(0), max(0);
-  for (unsigned int k(0); k < m_calLayers.size(); ++k) {
-    if (k > 0)
-      min += m_calLayers[k - 1];
-    max += m_calLayers[k];
-    if (ilayer >= min && ilayer < max) {
-      calib_coeff = m_calibrCoeff[k];
-      break;
-    }
+  if (ilayer < 0 || static_cast<std::size_t>(ilayer) >= m_layerCalib.size()) {
+    warning() << "Layer " << ilayer << " lies outside the calibrated range [0, " << m_layerCalib.size()
+              << "): calibrating this hit to zero energy" << endmsg;
+    return 0.f;
   }
-  assert(calib_coeff > 0);
-  return calib_coeff;
+  return m_layerCalib[ilayer];
 }

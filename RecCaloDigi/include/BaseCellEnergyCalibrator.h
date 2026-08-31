@@ -61,6 +61,9 @@ protected:
   SmartIF<IGeoSvc> m_geoSvc;
   // built once in initialize() from the geometry encoding string
   dd4hep::DDSegmentation::BitFieldCoder m_bitFieldCoder{};
+  // calibration coefficient per layer, expanded once in initialize() from the layer groups
+  // so that the per-hit lookup is a bounds check and an index
+  std::vector<float> m_layerCalib{};
 };
 
 #endif

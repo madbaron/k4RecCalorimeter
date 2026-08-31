@@ -9,7 +9,6 @@
 #include <k4Interface/IUniqueIDGenSvc.h>
 
 #include <algorithm>
-#include <assert.h>
 #include <cmath>
 #include <exception>
 #include <iostream>

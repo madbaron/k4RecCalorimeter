@@ -3,7 +3,6 @@
 #include "BaseDigitiserSilicon.h"
 
 #include <algorithm>
-#include <assert.h>
 #include <iostream>
 #include <string>
 
