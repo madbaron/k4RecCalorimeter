@@ -79,13 +79,25 @@
 
 class CHT {
 public:
+  /* The enumerator values below are a wire format, not free choices: they are the positional
+   * digits of the integer stored in CalorimeterHit::type (see the encoding above), and they
+   * must keep matching k4GaudiPandora's copy of this file, which reads back hits written here.
+   * Renumbering any of them changes the type of every hit and silently desynchronises the two
+   * packages.
+   *
+   * That is why "no match" sits in a different place in each enum. CaloID and Layout were
+   * defined by ILD with theirs at 0 ("unknown" and "any" respectively). CaloType could not
+   * follow, because 0 was already taken by "em", so its "unknown" is appended at the end
+   * instead. The inconsistency is inherited, not deliberate.
+   */
+
   /** calorimeter types */
   enum class CaloType { em = 0, had = 1, muon = 2, unknown = 3 };
 
   /** calo ids - specific to ILD */
   enum class CaloID { unknown = 0, ecal = 1, hcal = 2, yoke = 3, lcal = 4, lhcal = 5, bcal = 6 };
 
-  /** calo layout / subdetector  */
+  /** calo layout / subdetector; "any" is this enum's equivalent of "unknown" */
   enum class Layout { any = 0, barrel = 1, endcap = 2, plug = 3, ring = 4 };
 
   /** C'tor for initialization from CalorimeterHit::getType()  */
