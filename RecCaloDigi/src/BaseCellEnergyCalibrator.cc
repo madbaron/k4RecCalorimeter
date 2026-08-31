@@ -4,10 +4,7 @@
 #include <edm4hep/MutableCalorimeterHit.h>
 #include <edm4hep/SimCalorimeterHit.h>
 
-#include <algorithm>
-#include <cmath>
 #include <exception>
-#include <iostream>
 #include <string>
 
 using namespace std;

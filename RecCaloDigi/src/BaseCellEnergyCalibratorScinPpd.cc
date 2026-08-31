@@ -1,6 +1,5 @@
 #include "BaseCellEnergyCalibratorScinPpd.h"
 #include <cmath>
-#include <iostream>
 
 DECLARE_COMPONENT(BaseCellEnergyCalibratorScinPpd)
 

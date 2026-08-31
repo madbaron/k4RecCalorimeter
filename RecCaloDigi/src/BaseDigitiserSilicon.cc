@@ -2,12 +2,8 @@
 // For other detectors/models SimpleCaloDigi should be used
 #include "BaseDigitiserSilicon.h"
 
-#include <algorithm>
-#include <iostream>
+#include <stdexcept>
 #include <string>
-
-#include "CLHEP/Random/RandGauss.h"
-#include "CLHEP/Random/RandPoisson.h"
 
 using namespace std;
 

@@ -1,6 +1,4 @@
 #include "BaseCellEnergyCalibratorSilicon.h"
-#include <algorithm>
-#include <iostream>
 
 DECLARE_COMPONENT(BaseCellEnergyCalibratorSilicon)
 

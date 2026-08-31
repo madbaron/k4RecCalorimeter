@@ -1,7 +1,7 @@
 // Calorimeter digitiser
 #include "BaseDigitiser.h"
 
-#include <CalorimeterHitType.h>
+#include "CalorimeterHitType.h"
 #include <edm4hep/CaloHitContribution.h>
 #include <edm4hep/CaloHitSimCaloHitLinkCollection.h>
 #include <edm4hep/MutableCalorimeterHit.h>
@@ -11,8 +11,6 @@
 #include <algorithm>
 #include <cmath>
 #include <exception>
-#include <iostream>
-#include <set>
 #include <string>
 
 #include "CLHEP/Units/PhysicalConstants.h"

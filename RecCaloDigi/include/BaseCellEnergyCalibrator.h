@@ -7,7 +7,6 @@
 #include <edm4hep/CalorimeterHit.h>
 #include <edm4hep/CalorimeterHitCollection.h>
 
-#include "CalorimeterHitType.h"
 #include "k4Interface/IGeoSvc.h"
 
 #include <DDSegmentation/BitFieldCoder.h>

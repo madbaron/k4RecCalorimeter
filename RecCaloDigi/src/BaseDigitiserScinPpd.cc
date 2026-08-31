@@ -3,12 +3,9 @@
 
 #include "BaseDigitiserScinPpd.h"
 
-#include <algorithm>
-#include <iostream>
+#include <cmath>
+#include <stdexcept>
 #include <string>
-
-#include "CLHEP/Random/RandBinomial.h"
-#include "CLHEP/Random/RandGauss.h"
 
 using namespace std;
 
