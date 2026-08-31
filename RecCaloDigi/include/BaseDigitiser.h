@@ -8,6 +8,7 @@
 #include <edm4hep/SimCalorimeterHitCollection.h>
 #include <k4FWCore/Transformer.h>
 
+#include "CalorimeterHitType.h"
 #include "k4Interface/IGeoSvc.h"
 #include "k4Interface/IUniqueIDGenSvc.h"
 
@@ -103,12 +104,17 @@ protected:
       this, "thresholdUnit", std::string("MIP"),
       "Unit for threshold. Can be \"GeV\", \"MIP\" or \"px\". MIP and px need properly set calibration constants"};
   // id parameters
-  Gaudi::Property<std::string> m_calo_type{this, "CaloType", "em", "Calorimeter Type: em, had, mu"};
+  Gaudi::Property<std::string> m_calo_type{this, "CaloType", "em", "Calorimeter Type: em, had, muon"};
   Gaudi::Property<std::string> m_calo_id{this, "CaloID", "ecal", "Calorimeter ID: ecal, hcal, yoke, lcal, lhcal, bcal"};
   Gaudi::Property<std::string> m_calo_layout{this, "CaloLayout", "barrel",
                                              "Calorimeter Layout: barrel, endcap, ring, plug"};
 
   EnergyScale m_threshold_iunit{EnergyScale::MIP};
+  // decoded once in initialize(): the calorimeter type, ID and layout are the same
+  // for every hit of every event
+  CHT::CaloType m_chtType{CHT::CaloType::unknown};
+  CHT::CaloID m_chtId{CHT::CaloID::unknown};
+  CHT::Layout m_chtLayout{CHT::Layout::any};
   inline static thread_local TRandom2 m_engine;
   SmartIF<IGeoSvc> m_geoSvc;
   SmartIF<IUniqueIDGenSvc> m_uidSvc;

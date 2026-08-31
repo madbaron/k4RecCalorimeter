@@ -85,6 +85,28 @@ StatusCode BaseDigitiser::initialize() {
   }
   m_integr_function = findIter->second;
 
+  // Decode the calorimeter type/ID/layout once: these are fixed for the whole job.
+  // The *FromString helpers silently fall back to a default when nothing matches, so without
+  // these checks a typo in one of the properties would go unnoticed until someone wondered
+  // why every hit came out typed "unknown".
+  m_chtType = caloTypeFromString(m_calo_type);
+  if (m_chtType == CHT::CaloType::unknown) {
+    warning() << "CaloType '" << m_calo_type.value() << "' matches none of em, had, muon: hits will be typed as unknown"
+              << endmsg;
+  }
+
+  m_chtId = caloIDFromString(m_calo_id);
+  if (m_chtId == CHT::CaloID::unknown) {
+    warning() << "CaloID '" << m_calo_id.value()
+              << "' matches none of ecal, hcal, yoke, lcal, lhcal, bcal: hits will be typed as unknown" << endmsg;
+  }
+
+  m_chtLayout = layoutFromString(m_calo_layout);
+  if (m_chtLayout == CHT::Layout::any) {
+    warning() << "CaloLayout '" << m_calo_layout.value()
+              << "' matches none of barrel, endcap, plug, ring: hits will be typed as any" << endmsg;
+  }
+
   // check if parameters are correctly set for the ROC integration
   if ("ROC" == m_integration_method) {
     if (m_fast_shaper == 0.0f || m_slow_shaper == 0.0f) {
@@ -110,10 +132,6 @@ BaseDigitiser::operator()(const edm4hep::SimCalorimeterHitCollection& inputSim,
 
   edm4hep::CalorimeterHitCollection newcol;
   edm4hep::CaloHitSimCaloHitLinkCollection relcol;
-
-  CHT::CaloType cht_type = caloTypeFromString(m_calo_type);
-  CHT::CaloID cht_id = caloIDFromString(m_calo_id);
-  CHT::Layout cht_lay = layoutFromString(m_calo_layout);
 
   debug() << "Number of elements = " << inputSim.size() << endmsg;
 
@@ -145,7 +163,7 @@ BaseDigitiser::operator()(const edm4hep::SimCalorimeterHitCollection& inputSim,
       newhit.setEnergy(energyDig);
 
       int layer = m_bitFieldCoder.get(simhit.getCellID(), "layer");
-      newhit.setType(CHT(cht_type, cht_id, cht_lay, layer));
+      newhit.setType(CHT(m_chtType, m_chtId, m_chtLayout, layer));
 
       debug() << "orig/new hit energy: " << simhit.getEnergy() << " " << newhit.getEnergy() << endmsg;
 

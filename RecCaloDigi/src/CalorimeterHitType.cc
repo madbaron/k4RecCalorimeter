@@ -19,7 +19,6 @@
 #include "CalorimeterHitType.h"
 
 #include <algorithm>
-#include <iostream>
 #include <string>
 
 /** detailed string for calo type */
@@ -27,54 +26,54 @@ std::ostream& operator<<(std::ostream& os, const CHT& cht) {
   os << " calo hit type: ";
 
   switch (cht.caloType()) {
-  case CHT::em:
+  case CHT::CaloType::em:
     os << " em,   ";
     break;
-  case CHT::had:
+  case CHT::CaloType::had:
     os << " had,  ";
     break;
-  case CHT::muon:
+  case CHT::CaloType::muon:
     os << " muon, ";
     break;
   default:
     os << "  -  ,";
   }
   switch (cht.caloID()) {
-  case CHT::ecal:
+  case CHT::CaloID::ecal:
     os << "ecal,  ";
     break;
-  case CHT::hcal:
+  case CHT::CaloID::hcal:
     os << "hcal,  ";
     break;
-  case CHT::yoke:
+  case CHT::CaloID::yoke:
     os << "yoke,  ";
     break;
-  case CHT::lcal:
+  case CHT::CaloID::lcal:
     os << "lcal,  ";
     break;
-  case CHT::lhcal:
+  case CHT::CaloID::lhcal:
     os << "lhcal, ";
     break;
-  case CHT::bcal:
+  case CHT::CaloID::bcal:
     os << "bcal,  ";
     break;
   default:
     os << "  -  ,";
   }
   switch (cht.layout()) {
-  case CHT::any:
+  case CHT::Layout::any:
     os << "any,    ";
     break;
-  case CHT::ring:
+  case CHT::Layout::ring:
     os << "ring,   ";
     break;
-  case CHT::endcap:
+  case CHT::Layout::endcap:
     os << "endcap, ";
     break;
-  case CHT::barrel:
+  case CHT::Layout::barrel:
     os << "barrel, ";
     break;
-  case CHT::plug:
+  case CHT::Layout::plug:
     os << "plug,   ";
     break;
   default:
@@ -92,16 +91,15 @@ CHT::Layout layoutFromString(const std::string& name) {
   std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 
   if (str.find("ring") != std::string::npos)
-    return CHT::ring;
+    return CHT::Layout::ring;
   if (str.find("plug") != std::string::npos)
-    return CHT::plug;
+    return CHT::Layout::plug;
   if (str.find("endcap") != std::string::npos)
-    return CHT::endcap;
+    return CHT::Layout::endcap;
   if (str.find("barrel") != std::string::npos)
-    return CHT::barrel;
+    return CHT::Layout::barrel;
 
-  std::cout << " not found :" << str << " in " << name << std::endl;
-  return CHT::any;
+  return CHT::Layout::any;
 }
 
 CHT::CaloID caloIDFromString(const std::string& name) {
@@ -109,19 +107,19 @@ CHT::CaloID caloIDFromString(const std::string& name) {
   std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 
   if (str.find("ecal") != std::string::npos)
-    return CHT::ecal;
+    return CHT::CaloID::ecal;
   if (str.find("hcal") != std::string::npos)
-    return CHT::hcal;
+    return CHT::CaloID::hcal;
   if (str.find("yoke") != std::string::npos)
-    return CHT::yoke;
+    return CHT::CaloID::yoke;
   if (str.find("lcal") != std::string::npos)
-    return CHT::lcal;
+    return CHT::CaloID::lcal;
   if (str.find("lhcal") != std::string::npos)
-    return CHT::lhcal;
+    return CHT::CaloID::lhcal;
   if (str.find("bcal") != std::string::npos)
-    return CHT::bcal;
+    return CHT::CaloID::bcal;
 
-  return CHT::unknown;
+  return CHT::CaloID::unknown;
 }
 
 CHT::CaloType caloTypeFromString(const std::string& name) {
@@ -129,12 +127,11 @@ CHT::CaloType caloTypeFromString(const std::string& name) {
   std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 
   if (str.find("em") != std::string::npos)
-    return CHT::em;
+    return CHT::CaloType::em;
   if (str.find("had") != std::string::npos)
-    return CHT::had;
+    return CHT::CaloType::had;
   if (str.find("muon") != std::string::npos)
-    return CHT::muon;
+    return CHT::CaloType::muon;
 
-  // jl: this should probably also have a separate "unknown" or "any" value?
-  return CHT::em;
+  return CHT::CaloType::unknown;
 }

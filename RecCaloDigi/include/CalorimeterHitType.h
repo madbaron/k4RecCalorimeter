@@ -30,23 +30,23 @@
  *     lcio::CalorimeterHit* cHit = .... ;
  *
  *     // set the type (e.g. in digitization )
- *     cHit->setType( CHT( CHT::em ,  CHT::ecal , CHT::plug , 12 ) ) ;
+ *     cHit->setType( CHT( CHT::CaloType::em, CHT::CaloID::ecal, CHT::Layout::plug, 12 ) ) ;
  *
  *     ...
  *
  *     CHT cht = cHit->getType() ;
  *
  *     //   sum energies for electromagentic, hadronic and tailcatcher:
- *     if( cht.is( CHT::em ) )
+ *     if( cht.is( CHT::CaloType::em ) )
  *          e_em +=  cHit->getEnergy() ;
  *     else
- *       if ( cht.is(CHT::had ) )
+ *       if ( cht.is(CHT::CaloType::had ) )
  *          e_had += cHit->getEnergy() ;
  *       else
  *          e_muon += cHit->getEnergy() ;
  *
  *     // use only EcalPlug hits:
- *     if( cht.is( CHT::ecal) && cht.is( CHT::plug) )
+ *     if( cht.is( CHT::CaloID::ecal) && cht.is( CHT::Layout::plug) )
  *
  *     // get the layer number (e.g. for calibration or clustering)
  *     unsigned l = cht.layer() ;
@@ -64,20 +64,21 @@
 class CHT {
 public:
   /** calorimeter types */
-  enum CaloType { em = 0, had = 1, muon = 2 };
+  enum class CaloType { em = 0, had = 1, muon = 2, unknown = 3 };
 
   /** calo ids - specific to ILD */
-  enum CaloID { unknown = 0, ecal = 1, hcal = 2, yoke = 3, lcal = 4, lhcal = 5, bcal = 6 };
+  enum class CaloID { unknown = 0, ecal = 1, hcal = 2, yoke = 3, lcal = 4, lhcal = 5, bcal = 6 };
 
   /** calo layout / subdetector  */
-  enum Layout { any = 0, barrel = 1, endcap = 2, plug = 3, ring = 4 };
+  enum class Layout { any = 0, barrel = 1, endcap = 2, plug = 3, ring = 4 };
 
   /** C'tor for initialization from CalorimeterHit::getType()  */
   CHT(int type) : m_type(type) {}
 
   /** C'tor  for encoding the calo type inforamtion  */
   CHT(CaloType c, CaloID n, Layout l, unsigned lay)
-      : m_type(c * fCaloType + n * fCaloID + l * fLayout + lay * fLayer) {}
+      : m_type(static_cast<int>(c) * fCaloType + static_cast<int>(n) * fCaloID + static_cast<int>(l) * fLayout +
+               lay * fLayer) {}
 
   /** calorimeter type: CHT::em , CHT::had, CHT::muon */
   CaloType caloType() const { return static_cast<CaloType>(m_type % fCaloID); }
@@ -115,16 +116,16 @@ protected:
 /** detailed string for calo type */
 std::ostream& operator<<(std::ostream& os, const CHT& cht);
 
-/** Return Layout based on the collection name, e.g. if name contains tolower("endcap") CHT::endcap is returned. In case
-   no known layout is found, CHT::any is returned.*/
+/** Return Layout based on the collection name, e.g. if name contains tolower("endcap") CHT::Layout::endcap is
+   returned. In case no known layout is found, CHT::Layout::any is returned.*/
 CHT::Layout layoutFromString(const std::string& name);
 
-/** Return caloID based on the collection name, e.g. if name contains tolower("HCal") CHT::hcal is returned. In case no
-   known type is found, CHT::unknown is returned.*/
+/** Return caloID based on the collection name, e.g. if name contains tolower("HCal") CHT::CaloID::hcal is returned.
+   In case no known type is found, CHT::CaloID::unknown is returned.*/
 CHT::CaloID caloIDFromString(const std::string& name);
 
-/** Return caloType from string, e.g. if name contains tolower("Had") CHT::had is returned. In case no known type
-    is found, CHT::em is returned.*/
+/** Return caloType from string, e.g. if name contains tolower("Had") CHT::CaloType::had is returned. In case no
+    known type is found, CHT::CaloType::unknown is returned.*/
 CHT::CaloType caloTypeFromString(const std::string& name);
 
 #endif
