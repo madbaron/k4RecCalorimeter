@@ -19,6 +19,7 @@ protected:
   float digitiseDetectorEnergy(float energy) const override;
   // convert energy from the input scale to the output (NPE) scale
   float convertEnergy(float energy, EnergyScale inputUnit) const override;
+  bool canConvertFrom(EnergyScale inputUnit) const override;
 
   Gaudi::Property<float> m_PPD_pe_per_mip{this, "ppd_mipPe", 10.0f,
                                           "# Photo-electrons per MIP (scintillator): used to Poisson smear #PEs if >0"};

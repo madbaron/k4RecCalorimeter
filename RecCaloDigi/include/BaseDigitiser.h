@@ -68,6 +68,10 @@ protected:
   virtual float digitiseDetectorEnergy(float energy) const = 0;
   // convert energy from the input scale to the scale of the derived class
   virtual float convertEnergy(float energy, EnergyScale inScale) const = 0;
+  // whether convertEnergy() accepts that input scale. Checked in initialize() so that a
+  // threshold configured in units this technology cannot express fails at startup, rather
+  // than at the point of conversion.
+  virtual bool canConvertFrom(EnergyScale inScale) const = 0;
 
   // timing
   Gaudi::Property<int> m_time_apply{this, "timingCut", 0, "Use hit times"};

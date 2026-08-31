@@ -68,6 +68,11 @@ StatusCode BaseDigitiser::initialize() {
   }
 
   // convert the threshold to the approriate units (i.e. MIP for silicon, NPE for scint)
+  if (!canConvertFrom(m_threshold_iunit)) {
+    error() << "thresholdUnit '" << m_threshold_unit.value()
+            << "' cannot be expressed on the output scale of this digitiser" << endmsg;
+    return StatusCode::FAILURE;
+  }
   m_threshold_value = convertEnergy(m_threshold_value, m_threshold_iunit);
 
   // deal with timing calculations

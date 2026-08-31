@@ -17,6 +17,7 @@ public:
 protected:
   // convert energy from the input scale to the output (MIP) scale
   float convertEnergy(float energy, EnergyScale inputUnit) const override;
+  bool canConvertFrom(EnergyScale inputUnit) const override;
   // apply silicon-specific digitisation
   float digitiseDetectorEnergy(float energy) const override;
 

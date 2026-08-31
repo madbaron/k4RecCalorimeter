@@ -4,7 +4,6 @@
 #include "DigitiserScinPpdNpe.h"
 
 #include <cmath>
-#include <stdexcept>
 #include <string>
 
 using namespace std;
@@ -13,17 +12,16 @@ DECLARE_COMPONENT(DigitiserScinPpdNpe)
 
 DigitiserScinPpdNpe::DigitiserScinPpdNpe(const std::string& name, ISvcLocator* svcLoc) : BaseDigitiser(name, svcLoc) {}
 
+// every scale we know about can be expressed in photo-electrons
+bool DigitiserScinPpdNpe::canConvertFrom(EnergyScale) const { return true; }
+
 // convert energy from input to output scale (NPE)
 float DigitiserScinPpdNpe::convertEnergy(float energy, EnergyScale inUnit) const {
-  if (inUnit == EnergyScale::NPE)
-    return energy;
-  else if (inUnit == EnergyScale::MIP)
+  if (inUnit == EnergyScale::MIP)
     return m_PPD_pe_per_mip * energy;
-  else if (inUnit == EnergyScale::GEVDEP)
+  if (inUnit == EnergyScale::GEVDEP)
     return m_PPD_pe_per_mip * energy / m_calib_mip;
-
-  throw std::runtime_error("DigitiserScinPpdNpe::convertEnergy - unknown unit " +
-                           std::to_string(static_cast<int>(inUnit)));
+  return energy; // already a photo-electron count
 }
 
 float DigitiserScinPpdNpe::digitiseDetectorEnergy(float energy) const {

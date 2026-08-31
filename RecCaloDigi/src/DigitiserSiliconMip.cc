@@ -2,7 +2,6 @@
 // For other detectors/models SimpleCaloDigi should be used
 #include "DigitiserSiliconMip.h"
 
-#include <stdexcept>
 #include <string>
 
 using namespace std;
@@ -11,16 +10,18 @@ DECLARE_COMPONENT(DigitiserSiliconMip)
 
 DigitiserSiliconMip::DigitiserSiliconMip(const std::string& name, ISvcLocator* svcLoc) : BaseDigitiser(name, svcLoc) {}
 
+// a MIP-scale output can be reached from deposited GeV or from MIPs, but there is no way to
+// get there from a photo-electron count: that needs the scintillator+PPD response model
+bool DigitiserSiliconMip::canConvertFrom(EnergyScale inUnit) const {
+  return inUnit == EnergyScale::MIP || inUnit == EnergyScale::GEVDEP;
+}
+
 // convert energy from input to output scale (MIP)
 float DigitiserSiliconMip::convertEnergy(float energy, EnergyScale inUnit) const {
-  // converts input energy to MIP scale
-  if (inUnit == EnergyScale::MIP)
-    return energy;
-  else if (inUnit == EnergyScale::GEVDEP)
+  // only the scales accepted by canConvertFrom() reach this point
+  if (inUnit == EnergyScale::GEVDEP)
     return energy / m_calib_mip;
-
-  throw std::runtime_error("DigitiserSiliconMip::convertEnergy - unknown unit " +
-                           std::to_string(static_cast<int>(inUnit)));
+  return energy; // already on the MIP scale
 }
 
 float DigitiserSiliconMip::digitiseDetectorEnergy(float energy) const {
