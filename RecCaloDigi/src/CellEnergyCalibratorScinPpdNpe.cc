@@ -1,12 +1,12 @@
-#include "BaseCellEnergyCalibratorScinPpd.h"
+#include "CellEnergyCalibratorScinPpdNpe.h"
 #include <cmath>
 
-DECLARE_COMPONENT(BaseCellEnergyCalibratorScinPpd)
+DECLARE_COMPONENT(CellEnergyCalibratorScinPpdNpe)
 
-BaseCellEnergyCalibratorScinPpd::BaseCellEnergyCalibratorScinPpd(const std::string& name, ISvcLocator* svcLoc)
+CellEnergyCalibratorScinPpdNpe::CellEnergyCalibratorScinPpdNpe(const std::string& name, ISvcLocator* svcLoc)
     : BaseCellEnergyCalibrator(name, svcLoc) {}
 
-float BaseCellEnergyCalibratorScinPpd::reconstructEnergy(const edm4hep::CalorimeterHit& hit, int layer) const {
+float CellEnergyCalibratorScinPpdNpe::reconstructEnergy(const edm4hep::CalorimeterHit& hit, int layer) const {
   // here the input energy should be in NPE
   float energy = hit.getEnergy();
 

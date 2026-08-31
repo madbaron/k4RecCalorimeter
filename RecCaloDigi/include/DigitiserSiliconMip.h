@@ -1,17 +1,18 @@
-#ifndef BASEDIGITISERSILICON_H
-#define BASEDIGITISERSILICON_H 1
+#ifndef DIGITISERSILICONMIP_H
+#define DIGITISERSILICONMIP_H 1
 
 #include "BaseDigitiser.h"
 
-/** === BaseDigitiserSilicon algorithm === <br>
+/** === DigitiserSiliconMip algorithm === <br>
     digitisation of silicon calorimeter hits
+    input: deposited GeV, output: MIP scale
     D.Jeans 02/2016.
 */
 
-struct BaseDigitiserSilicon : public BaseDigitiser {
+struct DigitiserSiliconMip : public BaseDigitiser {
 
 public:
-  BaseDigitiserSilicon(const std::string& name, ISvcLocator* svcLoc);
+  DigitiserSiliconMip(const std::string& name, ISvcLocator* svcLoc);
 
 protected:
   // convert energy from the input scale to the output (MIP) scale

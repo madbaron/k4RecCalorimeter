@@ -1,30 +1,29 @@
 // Calorimeter digitiser for the IDC ECAL and HCAL
 // For other detectors/models SimpleCaloDigi should be used
-#include "BaseDigitiserSilicon.h"
+#include "DigitiserSiliconMip.h"
 
 #include <stdexcept>
 #include <string>
 
 using namespace std;
 
-DECLARE_COMPONENT(BaseDigitiserSilicon)
+DECLARE_COMPONENT(DigitiserSiliconMip)
 
-BaseDigitiserSilicon::BaseDigitiserSilicon(const std::string& name, ISvcLocator* svcLoc)
-    : BaseDigitiser(name, svcLoc) {}
+DigitiserSiliconMip::DigitiserSiliconMip(const std::string& name, ISvcLocator* svcLoc) : BaseDigitiser(name, svcLoc) {}
 
 // convert energy from input to output scale (MIP)
-float BaseDigitiserSilicon::convertEnergy(float energy, EnergyScale inUnit) const {
+float DigitiserSiliconMip::convertEnergy(float energy, EnergyScale inUnit) const {
   // converts input energy to MIP scale
   if (inUnit == EnergyScale::MIP)
     return energy;
   else if (inUnit == EnergyScale::GEVDEP)
     return energy / m_calib_mip;
 
-  throw std::runtime_error("BaseDigitiserSilicon::convertEnergy - unknown unit " +
+  throw std::runtime_error("DigitiserSiliconMip::convertEnergy - unknown unit " +
                            std::to_string(static_cast<int>(inUnit)));
 }
 
-float BaseDigitiserSilicon::digitiseDetectorEnergy(float energy) const {
+float DigitiserSiliconMip::digitiseDetectorEnergy(float energy) const {
   // applies extra digitisation to silicon hits
   //  input energy in deposited GeV
   //  output is MIP scale

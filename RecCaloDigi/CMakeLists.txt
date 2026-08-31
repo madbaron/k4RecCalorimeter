@@ -27,10 +27,10 @@ target_include_directories(RecCaloDigi PUBLIC
 # Concrete algorithm plugins — loaded at runtime by Gaudi
 gaudi_add_module(k4RecCaloDigiPlugins
   SOURCES
-    src/BaseDigitiserScinPpd.cc
-    src/BaseDigitiserSilicon.cc
-    src/BaseCellEnergyCalibratorScinPpd.cc
-    src/BaseCellEnergyCalibratorSilicon.cc
+    src/DigitiserScinPpdNpe.cc
+    src/DigitiserSiliconMip.cc
+    src/CellEnergyCalibratorScinPpdNpe.cc
+    src/CellEnergyCalibratorSiliconMip.cc
   LINK
     RecCaloDigi
     Gaudi::GaudiKernel

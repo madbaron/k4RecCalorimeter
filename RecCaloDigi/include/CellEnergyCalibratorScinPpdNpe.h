@@ -1,16 +1,17 @@
-#ifndef BASECELLENERGYCALIBRATORSCINPPD_H
-#define BASECELLENERGYCALIBRATORSCINPPD_H 1
+#ifndef CELLENERGYCALIBRATORSCINPPDNPE_H
+#define CELLENERGYCALIBRATORSCINPPDNPE_H 1
 
 #include "BaseCellEnergyCalibrator.h"
 
-/** === BaseCellEnergyCalibratorScinPpd algorithm === <br>
+/** === CellEnergyCalibratorScinPpdNpe algorithm === <br>
     calibration of digitised scint+PPD calorimeter hits
+    input: saturated photo-electrons (NPE), output: shower GeV, via PPD de-saturation
     D.Jeans 02/2016.
 */
 
-struct BaseCellEnergyCalibratorScinPpd final : BaseCellEnergyCalibrator {
+struct CellEnergyCalibratorScinPpdNpe final : BaseCellEnergyCalibrator {
 public:
-  BaseCellEnergyCalibratorScinPpd(const std::string& name, ISvcLocator* svcLoc);
+  CellEnergyCalibratorScinPpdNpe(const std::string& name, ISvcLocator* svcLoc);
 
 protected:
   float reconstructEnergy(const edm4hep::CalorimeterHit& hit, int layer) const override;

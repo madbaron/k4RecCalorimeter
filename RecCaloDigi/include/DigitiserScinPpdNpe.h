@@ -1,17 +1,18 @@
-#ifndef BASEDIGITISERSCINPPD_H
-#define BASEDIGITISERSCINPPD_H 1
+#ifndef DIGITISERSCINPPDNPE_H
+#define DIGITISERSCINPPDNPE_H 1
 
 #include "BaseDigitiser.h"
 
-/** === BaseDigitiserScinPpd algorithm === <br>
+/** === DigitiserScinPpdNpe algorithm === <br>
     digitisation of scint+PPD (SiPM, MPPC) calorimeter hits
+    input: deposited GeV, output: saturated photo-electrons (NPE)
     D.Jeans 02/2016.
 */
 
-struct BaseDigitiserScinPpd : public BaseDigitiser {
+struct DigitiserScinPpdNpe : public BaseDigitiser {
 
 public:
-  BaseDigitiserScinPpd(const std::string& name, ISvcLocator* svcLoc);
+  DigitiserScinPpdNpe(const std::string& name, ISvcLocator* svcLoc);
 
 protected:
   // apply scin+PPD specific effects
