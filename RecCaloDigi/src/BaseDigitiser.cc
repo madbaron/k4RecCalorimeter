@@ -64,7 +64,8 @@ StatusCode BaseDigitiser::initialize() {
   } else if (m_threshold_unit.value().compare("px") == 0) {
     m_threshold_iunit = EnergyScale::NPE;
   } else {
-    error() << "could not identify threshold unit. Please use \"GeV\", \"MIP\" or \"px\"! Aborting." << endmsg;
+    error() << "Could not identify threshold unit '" << m_threshold_unit.value()
+            << "'. Please use \"GeV\", \"MIP\" or \"px\"" << endmsg;
     return StatusCode::FAILURE;
   }
 
@@ -79,7 +80,6 @@ StatusCode BaseDigitiser::initialize() {
   if (integrations.end() == findIter) {
     error() << "Could not guess timing calculation method!" << endmsg;
     error() << "Available are: Standard, ROC. Provided: " << m_integration_method << endmsg;
-    error() << "Aborting..." << endmsg;
     return StatusCode::FAILURE;
   }
   m_integr_function = findIter->second;
@@ -110,7 +110,6 @@ StatusCode BaseDigitiser::initialize() {
   if ("ROC" == m_integration_method) {
     if (m_fast_shaper == 0.0f || m_slow_shaper == 0.0f) {
       error() << "Fast/slow shaper parameter(s) not set. Required for ROC integration!" << endmsg;
-      error() << "Aborting..." << endmsg;
       return StatusCode::FAILURE;
     }
   }
