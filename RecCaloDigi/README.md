@@ -110,9 +110,15 @@ a `CalorimeterHitCollection` would be the natural expectation. This is deliberat
 The calibrator produces a *new* hit collection — the energies change, so the hits cannot be
 modified in place — and it must also carry the association to the simulated hits forward, so
 that the calibrated hits stay usable by anything needing MC truth. Taking the link collection
-supplies both halves at once: `link.getFrom()` is the digitised hit to calibrate, and
-`link.getTo()` is the simulated hit that the newly created link must point back at. Nothing
-has to be matched up by hand.
+supplies both halves at once, and podio's typed accessors let the code say which half it wants
+without anyone having to remember which way the link points:
+
+```cpp
+const auto hit = link.get<edm4hep::CalorimeterHit>();     // the digitised hit to calibrate
+const auto sim = link.get<edm4hep::SimCalorimeterHit>();  // what the new link must point back at
+```
+
+Nothing has to be matched up by hand.
 
 The alternative — taking the hit and link collections as two separate inputs — requires a
 hit-to-link map to be built each event, and admits a configuration in which the two inputs do

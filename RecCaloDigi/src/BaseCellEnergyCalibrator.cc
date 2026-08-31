@@ -79,7 +79,7 @@ BaseCellEnergyCalibrator::operator()(const edm4hep::CaloHitSimCaloHitLinkCollect
   debug() << " number of elements = " << inputLinks.size() << endmsg;
 
   for (const auto& link : inputLinks) {
-    const edm4hep::CalorimeterHit hit = link.getFrom();
+    const edm4hep::CalorimeterHit hit = link.get<edm4hep::CalorimeterHit>();
     edm4hep::MutableCalorimeterHit calhit = newcol.create(); // make new hit
 
     const auto cellID = hit.getCellID();
@@ -92,9 +92,11 @@ BaseCellEnergyCalibrator::operator()(const edm4hep::CaloHitSimCaloHitLinkCollect
     calhit.setPosition(hit.getPosition());
     calhit.setType(hit.getType());
 
+    // the setters stay positional: podio's templated set() rejects the mutable handles that
+    // create() returns, and the argument type makes the direction unambiguous here anyway
     auto newLink = relcol.create();
     newLink.setFrom(calhit);
-    newLink.setTo(link.getTo());
+    newLink.setTo(link.get<edm4hep::SimCalorimeterHit>());
     newLink.setWeight(1.0);
   }
 
